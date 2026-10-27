@@ -1,0 +1,3 @@
+{% extends 'base.html' %}
+{% block title %}Không có quyền truy cập{% endblock %}
+{% block content %}<div class="error-page"><div class="error-code">403</div><h1>Không có quyền truy cập</h1><p>Tài khoản của bạn không được phép thực hiện thao tác này.</p><a class="btn btn-primary" href="{{ url_for('main.dashboard') }}">Quay lại tổng quan</a></div>{% endblock %}

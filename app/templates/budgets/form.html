@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Sửa hạn mức' if budget else 'Thiết lập hạn mức' }} · Chi tiêu Gia đình{% endblock %}
+{% block content %}
+<div class="page-heading mb-4"><p class="eyebrow">KIỂM SOÁT NGÂN SÁCH</p><h1 class="page-title">{{ 'Chỉnh sửa hạn mức' if budget else 'Thiết lập hạn mức' }}</h1><p class="text-secondary mb-0">Hạn mức chỉ tính các khoản chi tiêu, không tính giao dịch thu nhập.</p></div>
+<div class="row justify-content-center"><div class="col-12 col-xl-8"><section class="content-card form-card"><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="row g-3">
+        <div class="col-md-6"><label class="form-label" for="source">Phạm vi hạn mức</label><select class="form-select" name="source" id="source"><option value="personal" {{ 'selected' if request.form.get('source', budget.source if budget else 'personal') == 'personal' }}>Thành viên cá nhân</option><option value="common" {{ 'selected' if request.form.get('source', budget.source if budget else 'personal') == 'common' }}>Quỹ chung gia đình</option></select></div>
+        <div class="col-md-6" id="memberField"><label class="form-label" for="idUser">Thành viên</label><select class="form-select" name="idUser" id="idUser"><option value="">Chọn thành viên</option>{% for member in members %}<option value="{{ member.idUser }}" {{ 'selected' if request.form.get('idUser', budget.idUser|string if budget and budget.idUser else '') == member.idUser|string }}>{{ member.hoten }} ({{ member.username }})</option>{% endfor %}</select></div>
+        <div class="col-md-6"><label class="form-label" for="amountLimit">Hạn mức (VNĐ)</label><input class="form-control" type="number" min="0.01" max="999999999999.99" step="0.01" name="amountLimit" id="amountLimit" required value="{{ request.form.get('amountLimit', budget.amountLimit if budget else '') }}" placeholder="Ví dụ: 5000000"></div>
+        <div class="col-md-6"><label class="form-label" for="year">Năm áp dụng</label><input class="form-control" type="number" min="2000" max="2100" name="year" id="year" required value="{{ request.form.get('year', budget.year if budget else current_year if current_year is defined else '') }}"></div>
+        <div class="col-md-6"><label class="form-label" for="period_type">Chu kỳ</label><select class="form-select" name="period_type" id="period_type"><option value="monthly" {{ 'selected' if request.form.get('period_type', budget.period_type if budget else 'monthly') == 'monthly' }}>Theo tháng</option><option value="quarterly" {{ 'selected' if request.form.get('period_type', budget.period_type if budget else '') == 'quarterly' }}>Theo quý</option><option value="weekly" {{ 'selected' if request.form.get('period_type', budget.period_type if budget else '') == 'weekly' }}>Theo tuần (ISO)</option></select></div>
+        <div class="col-md-6"><label class="form-label" id="periodNumberLabel" for="period_number">Tháng</label><select class="form-select" name="period_number" id="period_number" required></select><div class="form-text" id="periodHelp">Chọn tháng áp dụng.</div></div>
+    </div>
+    <div class="form-actions mt-4 pt-3"><a class="btn btn-light border" href="{{ url_for('budgets.index') }}">Hủy</a><button class="btn btn-primary" type="submit"><i class="bi bi-check2 me-1"></i>{{ 'Lưu thay đổi' if budget else 'Tạo hạn mức' }}</button></div>
+</form></section></div></div>
+{% endblock %}
+{% block scripts %}
+<script>
+const sourceSelect = document.getElementById('source');
+const memberField = document.getElementById('memberField');
+const periodType = document.getElementById('period_type');
+const periodNumber = document.getElementById('period_number');
+const periodLabel = document.getElementById('periodNumberLabel');
+const periodHelp = document.getElementById('periodHelp');
+const initialPeriodNumber = {{ request.form.get('period_number', budget.period_number if budget else (current_month if current_month is defined else 1))|int|tojson }};
+function updateMemberField() { const common = sourceSelect.value === 'common'; memberField.classList.toggle('d-none', common); document.getElementById('idUser').required = !common; }
+function updatePeriods() {
+    const type = periodType.value;
+    let count = 12, prefix = 'Tháng', help = 'Chọn tháng áp dụng.';
+    if (type === 'quarterly') { count = 4; prefix = 'Quý'; help = 'Chọn quý áp dụng (1–4).'; }
+    if (type === 'weekly') { count = 53; prefix = 'Tuần'; help = 'Tuần theo chuẩn ISO, từ 1 đến 52 hoặc 53 tùy năm.'; }
+    periodLabel.textContent = prefix;
+    periodHelp.textContent = help;
+    const old = Number(periodNumber.value || initialPeriodNumber);
+    periodNumber.innerHTML = '';
+    for (let i = 1; i <= count; i++) { const option = document.createElement('option'); option.value = String(i); option.textContent = prefix + ' ' + String(i).padStart(type === 'monthly' ? 2 : 1, '0'); periodNumber.appendChild(option); }
+    periodNumber.value = String(Math.min(Math.max(old, 1), count));
+}
+sourceSelect.addEventListener('change', updateMemberField);
+periodType.addEventListener('change', updatePeriods);
+updateMemberField(); updatePeriods();
+</script>
+{% endblock %}

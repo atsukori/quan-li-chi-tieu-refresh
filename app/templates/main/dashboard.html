@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Tổng quan · Chi tiêu Gia đình{% endblock %}
+{% block content %}
+<div class="page-heading d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div><p class="eyebrow">BẢNG ĐIỀU KHIỂN</p><h1 class="page-title">Xin chào, {{ current_user.hoten }} 👋</h1><p class="text-secondary mb-0">Theo dõi tình hình tài chính tháng này trong một cái nhìn tổng quan.</p></div>
+    <a class="btn btn-primary" href="{{ url_for('transactions.create') }}"><i class="bi bi-plus-lg me-2"></i>Thêm giao dịch</a>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3"><div class="stat-card stat-income"><div class="stat-top"><span>Tổng thu tháng này</span><span class="stat-icon"><i class="bi bi-arrow-down-left"></i></span></div><div class="stat-value">{{ income_total|vnd }}</div><div class="stat-foot">Các khoản thu đã ghi nhận</div></div></div>
+    <div class="col-12 col-sm-6 col-xl-3"><div class="stat-card stat-expense"><div class="stat-top"><span>Tổng chi tháng này</span><span class="stat-icon"><i class="bi bi-arrow-up-right"></i></span></div><div class="stat-value">{{ expense_total|vnd }}</div><div class="stat-foot">Các khoản chi đã ghi nhận</div></div></div>
+    <div class="col-12 col-sm-6 col-xl-3"><div class="stat-card stat-balance"><div class="stat-top"><span>Chênh lệch thu - chi</span><span class="stat-icon"><i class="bi bi-wallet"></i></span></div><div class="stat-value">{{ balance|vnd }}</div><div class="stat-foot">Thu trừ chi trong tháng</div></div></div>
+    <div class="col-12 col-sm-6 col-xl-3"><div class="stat-card stat-transactions"><div class="stat-top"><span>{{ 'Tổng giao dịch hệ thống' if current_user.is_admin else 'Giao dịch bạn có thể xem' }}</span><span class="stat-icon"><i class="bi bi-receipt"></i></span></div><div class="stat-value">{{ transaction_count }}</div><div class="stat-foot">{{ member_count ~ ' tài khoản thành viên' if current_user.is_admin else 'Bao gồm giao dịch quỹ chung' }}</div></div></div>
+</div>
+<div class="row g-4 mb-4">
+    <div class="col-12 col-xl-8"><section class="content-card h-100"><div class="section-heading"><div><h2 class="section-title">Xu hướng chi tiêu</h2><p class="section-subtitle">Chi tiêu theo ngày trong tháng hiện tại</p></div><span class="soft-badge"><i class="bi bi-calendar3 me-1"></i>Tháng này</span></div><div class="chart-container"><canvas id="expenseChart" aria-label="Biểu đồ chi tiêu theo ngày" role="img"></canvas></div></section></div>
+    <div class="col-12 col-xl-4"><section class="content-card h-100"><div class="section-heading"><div><h2 class="section-title">Hạn mức đang áp dụng</h2><p class="section-subtitle">Các kỳ có hiệu lực hôm nay</p></div><a class="section-link" href="{{ url_for('budgets.index') }}">Xem tất cả</a></div>
+        {% if budget_cards %}
+            <div class="budget-mini-list">
+            {% for row in budget_cards %}
+                <div class="budget-mini-item"><div class="d-flex justify-content-between gap-2 mb-2"><div><div class="budget-name">{{ 'Quỹ chung' if row.budget.source == 'common' else (row.budget.user.hoten if row.budget.user else 'Cá nhân') }}</div><div class="text-secondary small">{{ budget_period_label(row.budget) }}</div></div><span class="small fw-semibold {{ 'text-danger' if row.exceeded else 'text-secondary' }}">{{ 'Vượt mức' if row.exceeded else (row.percent|round|int|string ~ '%') }}</span></div><div class="progress budget-progress"><div class="progress-bar {{ 'bg-danger' if row.exceeded else 'bg-primary' }}" style="width: {{ row.percent }}%"></div></div><div class="d-flex justify-content-between mt-2 small"><span>{{ row.spent|vnd }}</span><span class="text-secondary">/ {{ row.budget.amountLimit|vnd }}</span></div></div>
+            {% endfor %}
+            </div>
+        {% else %}<div class="empty-state py-4"><div class="empty-icon"><i class="bi bi-speedometer2"></i></div><p class="mb-1 fw-semibold">Chưa có hạn mức hiệu lực</p><p class="small text-secondary mb-0">Quản trị viên có thể thiết lập hạn mức cho thành viên hoặc quỹ chung.</p></div>{% endif %}
+    </section></div>
+</div>
+<section class="content-card"><div class="section-heading"><div><h2 class="section-title">Giao dịch gần đây</h2><p class="section-subtitle">Những giao dịch được cập nhật gần nhất</p></div><a class="section-link" href="{{ url_for('transactions.index') }}">Tất cả giao dịch <i class="bi bi-arrow-right ms-1"></i></a></div>
+    {% if recent_items %}
+    <div class="table-responsive"><table class="table app-table align-middle mb-0"><thead><tr><th>Ngày</th><th>Giao dịch</th><th>Thành viên</th><th>Nguồn tiền</th><th class="text-end">Số tiền</th></tr></thead><tbody>
+    {% for item in recent_items %}<tr><td class="text-nowrap">{{ item.date|date_vn }}</td><td><div class="fw-semibold">{{ item.category.nameCategory }}</div><div class="text-secondary small">{{ item.purpose or 'Không có ghi chú' }}</div></td><td>{{ item.user.hoten }}</td><td><span class="badge rounded-pill {{ 'badge-common' if item.source == 'common' else 'badge-personal' }}">{{ 'Quỹ chung' if item.source == 'common' else 'Cá nhân' }}</span></td><td class="text-end fw-semibold text-nowrap {{ 'amount-income' if item.category.type == 'income' else 'amount-expense' }}">{{ '+' if item.category.type == 'income' else '−' }}{{ item.amount|vnd }}</td></tr>{% endfor %}
+    </tbody></table></div>
+    {% else %}<div class="empty-state"><div class="empty-icon"><i class="bi bi-receipt"></i></div><p class="fw-semibold mb-1">Chưa có giao dịch</p><p class="text-secondary small">Bắt đầu bằng cách thêm khoản thu hoặc chi đầu tiên.</p><a class="btn btn-sm btn-primary" href="{{ url_for('transactions.create') }}">Thêm giao dịch</a></div>{% endif %}
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+const chartCanvas = document.getElementById('expenseChart');
+if (chartCanvas) {
+    const labels = {{ chart_labels|tojson }}.map(value => new Date(value + 'T00:00:00').toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }));
+    const values = {{ chart_values|tojson }};
+    new Chart(chartCanvas, {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Chi tiêu (VNĐ)', data: values, borderColor: '#3468f5', backgroundColor: 'rgba(52,104,245,.12)', fill: true, tension: .35, pointRadius: 3, pointHoverRadius: 5 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: context => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(context.raw) } } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { callback: value => new Intl.NumberFormat('vi-VN', { notation: 'compact', maximumFractionDigits: 1 }).format(value) }, grid: { color: '#edf0f5' } } } }
+    });
+}
+</script>
+{% endblock %}
