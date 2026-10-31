@@ -1,7 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title Family Expense Manager - Demo Data
+title Group Expense Manager - Demo Data
 
 if not exist ".venv\Scripts\activate.bat" (
     echo ERROR: Cannot find the .venv virtual environment.

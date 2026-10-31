@@ -80,7 +80,7 @@ def export_xlsx():
     workbook = Workbook()
     summary = workbook.active
     summary.title = "Tong quan"
-    summary.append(["BÁO CÁO QUẢN LÝ CHI TIÊU GIA ĐÌNH"])
+    summary.append(["BÁO CÁO QUẢN LÝ CHI TIÊU TẬP THỂ / TỔ CHỨC"])
     summary.append(["Từ ngày", report["start"].strftime("%d/%m/%Y")])
     summary.append(["Đến ngày", report["end"].strftime("%d/%m/%Y")])
     summary.append(["Tổng thu (VNĐ)", float(report["income_total"])])

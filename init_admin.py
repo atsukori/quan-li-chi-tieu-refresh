@@ -88,7 +88,7 @@ def main():
         if admin_role is None:
             admin_role = Role(
                 roleName="admin",
-                description="Quản trị tài khoản, danh mục, hạn mức và báo cáo toàn gia đình.",
+                description="Quản trị tài khoản, danh mục, hạn mức và báo cáo tài chính của tập thể / tổ chức.",
             )
             db.session.add(admin_role)
 

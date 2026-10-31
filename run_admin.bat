@@ -1,7 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title Family Expense Manager - Admin Only
+title Group Expense Manager - Admin Only
 
 if not exist ".venv\Scripts\activate.bat" (
     echo ERROR: Cannot find the .venv virtual environment.

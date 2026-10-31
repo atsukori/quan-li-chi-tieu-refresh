@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% block title %}Giao dịch · Chi tiêu Gia đình{% endblock %}
+{% block title %}Giao dịch · Chi tiêu Tập thể{% endblock %}
 {% block content %}
-<div class="page-heading d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4"><div><p class="eyebrow">SỔ THU CHI</p><h1 class="page-title">Giao dịch</h1><p class="text-secondary mb-0">Quản lý các khoản thu và chi cá nhân hoặc quỹ chung.</p></div><a class="btn btn-primary" href="{{ url_for('transactions.create') }}"><i class="bi bi-plus-lg me-2"></i>Thêm giao dịch</a></div>
+<div class="page-heading d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4"><div><p class="eyebrow">SỔ THU CHI</p><h1 class="page-title">Giao dịch</h1><p class="text-secondary mb-0">Quản lý các khoản thu/chi của thành viên và quỹ chung tập thể.</p></div><a class="btn btn-primary" href="{{ url_for('transactions.create') }}"><i class="bi bi-plus-lg me-2"></i>Thêm giao dịch</a></div>
 <section class="content-card mb-4"><form method="get" class="row g-3 align-items-end">
     <div class="col-6 col-md-3"><label class="form-label" for="start">Từ ngày</label><input class="form-control" type="date" name="start" id="start" value="{{ filters.start }}"></div>
     <div class="col-6 col-md-3"><label class="form-label" for="end">Đến ngày</label><input class="form-control" type="date" name="end" id="end" value="{{ filters.end }}"></div>

@@ -93,7 +93,7 @@ def _save_budget(budget):
     if source == "personal":
         user = db.session.get(User, int(user_raw)) if user_raw.isdigit() else None
         if not user:
-            errors.append("Hạn mức cá nhân phải gắn với một thành viên.")
+            errors.append("Hạn mức dành cho thành viên phải gắn với một tài khoản thành viên.")
     month = period_number if period_type == "monthly" else (period_number - 1) * 3 + 1 if period_type == "quarterly" else None
     if period_type == "weekly":
         try:

@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
-{% block title %}Tổng quan · Chi tiêu Gia đình{% endblock %}
+{% block title %}Tổng quan · Chi tiêu Tập thể{% endblock %}
 {% block content %}
 <div class="page-heading d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-    <div><p class="eyebrow">BẢNG ĐIỀU KHIỂN</p><h1 class="page-title">Xin chào, {{ current_user.hoten }} 👋</h1><p class="text-secondary mb-0">Theo dõi tình hình tài chính tháng này trong một cái nhìn tổng quan.</p></div>
+    <div><p class="eyebrow">BẢNG ĐIỀU KHIỂN</p><h1 class="page-title">Xin chào, {{ current_user.hoten }} 👋</h1><p class="text-secondary mb-0">Theo dõi tình hình tài chính của tập thể trong tháng này.</p></div>
     <a class="btn btn-primary" href="{{ url_for('transactions.create') }}"><i class="bi bi-plus-lg me-2"></i>Thêm giao dịch</a>
 </div>
 <div class="row g-3 mb-4">
     <div class="col-12 col-sm-6 col-xl-3"><div class="stat-card stat-income"><div class="stat-top"><span>Tổng thu tháng này</span><span class="stat-icon"><i class="bi bi-arrow-down-left"></i></span></div><div class="stat-value">{{ income_total|vnd }}</div><div class="stat-foot">Các khoản thu đã ghi nhận</div></div></div>
     <div class="col-12 col-sm-6 col-xl-3"><div class="stat-card stat-expense"><div class="stat-top"><span>Tổng chi tháng này</span><span class="stat-icon"><i class="bi bi-arrow-up-right"></i></span></div><div class="stat-value">{{ expense_total|vnd }}</div><div class="stat-foot">Các khoản chi đã ghi nhận</div></div></div>
     <div class="col-12 col-sm-6 col-xl-3"><div class="stat-card stat-balance"><div class="stat-top"><span>Chênh lệch thu - chi</span><span class="stat-icon"><i class="bi bi-wallet"></i></span></div><div class="stat-value">{{ balance|vnd }}</div><div class="stat-foot">Thu trừ chi trong tháng</div></div></div>
-    <div class="col-12 col-sm-6 col-xl-3"><div class="stat-card stat-transactions"><div class="stat-top"><span>{{ 'Tổng giao dịch hệ thống' if current_user.is_admin else 'Giao dịch bạn có thể xem' }}</span><span class="stat-icon"><i class="bi bi-receipt"></i></span></div><div class="stat-value">{{ transaction_count }}</div><div class="stat-foot">{{ member_count ~ ' tài khoản thành viên' if current_user.is_admin else 'Bao gồm giao dịch quỹ chung' }}</div></div></div>
+    <div class="col-12 col-sm-6 col-xl-3"><div class="stat-card stat-transactions"><div class="stat-top"><span>{{ 'Tổng giao dịch hệ thống' if current_user.is_admin else 'Giao dịch bạn có thể xem' }}</span><span class="stat-icon"><i class="bi bi-receipt"></i></span></div><div class="stat-value">{{ transaction_count }}</div><div class="stat-foot">{{ member_count ~ ' tài khoản thành viên' if current_user.is_admin else 'Bao gồm giao dịch quỹ chung của tập thể' }}</div></div></div>
 </div>
 <div class="row g-4 mb-4">
     <div class="col-12 col-xl-8"><section class="content-card h-100"><div class="section-heading"><div><h2 class="section-title">Xu hướng chi tiêu</h2><p class="section-subtitle">Chi tiêu theo ngày trong tháng hiện tại</p></div><span class="soft-badge"><i class="bi bi-calendar3 me-1"></i>Tháng này</span></div><div class="chart-container"><canvas id="expenseChart" aria-label="Biểu đồ chi tiêu theo ngày" role="img"></canvas></div></section></div>
@@ -20,7 +20,7 @@
                 <div class="budget-mini-item"><div class="d-flex justify-content-between gap-2 mb-2"><div><div class="budget-name">{{ 'Quỹ chung' if row.budget.source == 'common' else (row.budget.user.hoten if row.budget.user else 'Cá nhân') }}</div><div class="text-secondary small">{{ budget_period_label(row.budget) }}</div></div><span class="small fw-semibold {{ 'text-danger' if row.exceeded else 'text-secondary' }}">{{ 'Vượt mức' if row.exceeded else (row.percent|round|int|string ~ '%') }}</span></div><div class="progress budget-progress"><div class="progress-bar {{ 'bg-danger' if row.exceeded else 'bg-primary' }}" style="width: {{ row.percent }}%"></div></div><div class="d-flex justify-content-between mt-2 small"><span>{{ row.spent|vnd }}</span><span class="text-secondary">/ {{ row.budget.amountLimit|vnd }}</span></div></div>
             {% endfor %}
             </div>
-        {% else %}<div class="empty-state py-4"><div class="empty-icon"><i class="bi bi-speedometer2"></i></div><p class="mb-1 fw-semibold">Chưa có hạn mức hiệu lực</p><p class="small text-secondary mb-0">Quản trị viên có thể thiết lập hạn mức cho thành viên hoặc quỹ chung.</p></div>{% endif %}
+        {% else %}<div class="empty-state py-4"><div class="empty-icon"><i class="bi bi-speedometer2"></i></div><p class="mb-1 fw-semibold">Chưa có hạn mức hiệu lực</p><p class="small text-secondary mb-0">Quản trị viên có thể thiết lập hạn mức cho từng thành viên hoặc quỹ chung của tập thể.</p></div>{% endif %}
     </section></div>
 </div>
 <section class="content-card"><div class="section-heading"><div><h2 class="section-title">Giao dịch gần đây</h2><p class="section-subtitle">Những giao dịch được cập nhật gần nhất</p></div><a class="section-link" href="{{ url_for('transactions.index') }}">Tất cả giao dịch <i class="bi bi-arrow-right ms-1"></i></a></div>

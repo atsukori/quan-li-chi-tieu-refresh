@@ -144,7 +144,7 @@ def notify_budget_overruns(expense):
     for budget in applicable_budgets_for_expense(expense):
         spent, _, exceeded = budget_progress(budget)
         if exceeded:
-            warnings.append(f"Đã vượt hạn mức {budget_period_label(budget)} ({budget.source == 'common' and 'quỹ chung' or 'cá nhân'}): {spent:,.0f} / {Decimal(str(budget.amountLimit)):,.0f} VNĐ.")
+            warnings.append(f"Đã vượt hạn mức {budget_period_label(budget)} ({budget.source == 'common' and 'quỹ chung tập thể' or 'thành viên'}): {spent:,.0f} / {Decimal(str(budget.amountLimit)):,.0f} VNĐ.")
     for warning in warnings:
         flash(warning, "warning")
 
