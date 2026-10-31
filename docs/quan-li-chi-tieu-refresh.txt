@@ -1,0 +1,78 @@
+1. Tên dự án: Hệ thống quản lí chi tiêu cho tập thể / tổ chức
+2. Mục đích:
+Giải quyết bài toán quản lí tài chính phân tán, thiếu minh bạch và khó kiểm soát dòng tiền trong một tập thể, tổ chức hoặc nhóm người dùng, giúp các thành viên kiểm soát thu chi, lập kế hoạch tài chính khoa học và nâng cao tính minh bạch, trách nhiệm chung.
+3. Mô tả bài toán:
+Các thành viên trong tập thể được cấp tài khoản cá nhân để đăng nhập, ghi nhận và quản lí các khoản thu/chi hàng ngày. Hệ thống cho phép phân định rõ nguồn tiền (tiền cá nhân, quỹ chung hoặc ngân sách đơn vị), theo dõi hạn mức chi tiêu định kí và tự động cảnh báo khi các khoản chi tiêu vượt mức cho phép. Người quản trị (Admin) có toàn quyền quản lí tài khoản, phân quyền, thiết lập hạn mức và theo dõi tổng quan tài chính của toàn bộ tập thể/tổ chức.
+4. Các chức năng có trong dự án:
+• Đăng nhập và phân quyền (thành viên / quản trị viên)
+• Quản lí tài khoản thành viên (tạo, khóa/mở khóa, cập nhật thông tin)
+• Quản lí danh mục chi tiêu (phân loại các khoản chi phí sinh hoạt, học tập, hoạt động, công tác, giải trí...)
+• Đăng kí và quản lia khoản chi tiêu (thêm, sửa, xóa giao dịch thu/chi)
+• Thiết lập và cập nhật hạn mức chi tiêu (theo tuần, tháng, quý hoặc theo từng quỹ)
+• Thống kê và báo cáo tài chính (theo ngày, tuần, tháng, năm với bộ lọc linh hoạt theo nhóm / đơn vị)
+• Xuất dữ liệu báo cáo ra tệp Excel (*.xlsx) hoặc CSV
+5. Dữ liệu: Cơ sở dữ liệu
+Hệ thống sử dụng cơ sở dữ liệu gồm các bảng và liên kết chính:
+Bảng User (quản lí thông tin người dùng)
+| TT | Trường | Khóa | Giải thích |
+| --- | --- | --- | --- |
+| 1 | idUser | Khóa chính | Mã người dùng |
+| 2 | username | - | Tên đăng nhập |
+| 3 | password | - | Mật khẩu |
+| 4 | hoten | - | Họ và tên người dùng |
+| 5 | idRole | Khóa ngoại | Liên kết đến bảng Role |
+Bảng Role (quản lí phân quyền)
+| TT | Trường | Khóa | Giải thích |
+| --- | --- | --- | --- |
+| 1 | idRole | Khóa chính | Mã vai trò |
+| 2 | roleName | - | Tên vai trò (admin / user) |
+| 3 | description | - | Mô tả quyền |
+Bảng Category (danh mục chi tiêu)
+| TT | Trường | Khóa | Giải thích |
+| --- | --- | --- | --- |
+| 1 | idCategory | Khóa chính | Mã danh mục |
+| 2 | nameCategory | - | Tên danh mục |
+| 3 | type | - | Loại danh mục (chi tiêu / thu nhập) |
+Bảng Expense (quản lí giao dịch thu/chi)
+| TT | Trường | Khóa | Giải thích |
+| --- | --- | --- | --- |
+| 1 | idExpense | Khóa chính | Mã giao dịch |
+| 2 | idUser | Khóa ngoại | Liên kết đến bảng User |
+| 3 | idCategory | Khóa ngoại | Liên kết đến bảng Category |
+| 4 | date | - | Ngày thực hiện giao dịch (DD/MM/YYYY) |
+| 5 | amount | - | Số tiền giao dịch |
+| 6 | purpose | - | Mục đích / Ghi chú |
+| 7 | source | - | Nguồn tiền (cá nhân / quỹ chung / ngân sách đơn vị) |
+Bảng Budget (quản lí hạn mức chi tiêu)
+| TT | Trường | Khóa | Giải thích |
+| --- | --- | --- | --- |
+| 1 | idBudget | Khóa chính | Mã hạn mức |
+| 2 | idUser | Khóa ngoại | Liên kết đến bảng User |
+| 3 | amountLimit | - | Hạn mức tối đa cho phép |
+| 4 | month | - | Tháng áp dụng |
+| 5 | year | - | Năm áp dụng |
+6. Mô tả chi tiết các chức năng:
+• Đăng nhập và phân quyền: Người dùng đăng nhập bằng tài khoản được cấp. Hệ thống phân quyền rõ ràng: Quản trị viên (admin) quản lí toàn bộ hệ thống, tài khoản và hạn mức, thành viên (user) nhập liệu và theo dõi chi tiêu cá nhân/chung theo nhóm hoặc quỹ.
+• Quản lí tài khoản thành viên (admin): Cho phép admin tạo mới tài khoản cho các thành viên trong tậ thể, cập nhật thông tin, khóa hoặc mở khóa tài khoản khi cần thiết.
+• Quản lí danh mục chi tiêu: Cung cấp danh mục các khoản thu/chi chuẩn hóa giúp người dùng dễ dàng phân loại giao dịch theo hoạt động, phòng ban hoặc nhóm chi phí.
+• Đăng kí khoản chi tiêu: Thành viên nhập thông tin chi tiêu hàng ngày (ngày, số tiền, mục đích, nguồn tiền, danh mục). Hệ thống tự động kiểm tra với hạn mức, tính toán số tiền đã chi và số tiền còn lại.
+• Thiết lập và cập nhật hạn mức: Admin thiết lập hạn mức chi tiêu định kì (tháng/quý) cho từng thành viên, từng nhóm hoặc quỹ chung.
+• Thống kê và báo cáo: Cung cấp cái nhìn tổng quan về tình hình tài chính qua các bộ lọc thời gian linh hoạt (ngày, tuần, tháng, năm) kèm biểu đồ trực quan.
+• Xuất dữ liệu Excel hoặc CSV: Hỗ trợ xuất toàn bộ hoặc một phần lịch sử chi tiêu ra file Excel (*.xlsx) hoặc CSV để lưu trữ hoặc phục vụ phân tích tài chính sâu hơn.
+7. Dữ liệu:
+• Dữ liệu thực tế thu thập được: Dự kiến thu thập khoảng 1000-2000 bản ghi dữ liệu giao dịch thu/chi giả định/thực tế từ nhiều thành viên trong tập thể trong thời gian 3-6 tháng (kèm file Excel mẫu cấu trúc dữ liệu).
+• Các trường hợp dữ liệu cụ thể cần giải quyết: - Trường hợp nhập số tiền âm hoặc bằng 0 => Hệ thống hiển thị thông báo lỗi và yêu cầu nhập lại. - Trường hợp chi tiêu vượt quá hạn mức tháng => Hệ thống phát cảnh báo trực quan trên giao diện. - Trường hợp trùng lặp giao dịch trong ngày => Hỗ trợ tính năng cảnh báo, chỉnh sửa hoặc xóa giao dịch phát sinh.
+8. Lợi ích sản phẩm:
+• Minh bạch hóa tài chính trong tập thể / tổ chức, giúp các thành viên chia sẻ trách nhiệm chi tiêu.
+• Kiểm soát chặt chẽ các khoản chi tiêu phát sinh, hạn chế tình trạng vượt hạn mức hoặc lãng phí.
+• Cung cấp dữ liệu thống kê trực quan, hỗ trợ lập kế hoạch tài chính dài hạn hiệu quả.
+• Thay thế hoàn toàn phương pháp ghi chép sổ sách thủ công truyền thống, nhanh chóng, chính xác và tiện lợi.
+9. Hạn chế:
+• Chưa hỗ trợ kết nối tự động với tài khoản ngân hàng hoặc ví điện tử.
+• Giao diện hiện tại tập trung vào phiên bản web cục bộ cơ bản, chưa có ứng dụng di động độc lập.
+• Chưa tích hợp tính năng đa tiền tệ.
+10. Phát triển:
+• Tích hợp công nghệ nhận diện hóa đơn/biên lai tự động qua camera thiết bị.
+• Phát triển ứng dụng di động để thuận tiện sử dụng mọi lúc mọi nơi.
+• Kết nối API ngân hàng để tự động ghi nhận biến động số dư và giao dịch chi tiêu.
+• Bổ sung tính năng lập quỹ tiết kiệm chung cho các mục tiêu lớn của tập thể / tổ chức (mua sắm, sự kiện, hoạt động, du lịch...).
