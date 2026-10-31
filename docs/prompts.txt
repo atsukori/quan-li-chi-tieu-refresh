@@ -1,4 +1,4 @@
-• Dựa vào bản "Hồ sơ dự án" được mô tả trong tệp quan-li-chi-tieu.docx, hãy đóng vai trò là một lập trình viên Full-stack Python chuyên nghiệp để xây dựng toàn bộ mã nguồn hoàn chỉnh cho ứng dụng "Hệ thống Quản lý Chi tiêu Gia đình" chạy trên nền tảng Flask (Python 3.11), sử dụng cơ sở dữ liệu SQLite, chạy cục bộ trên hệ điều hành Windows (localhost) và sẵn sàng để quản lý mã nguồn qua Git/GitHub.
+• Dựa vào bản "Hồ sơ dự án" được mô tả trong tệp quan-li-chi-tieu-refresh.docx, hãy đóng vai trò là một lập trình viên Full-stack Python chuyên nghiệp để xây dựng toàn bộ mã nguồn hoàn chỉnh cho ứng dụng "Hệ thống Quản lý Chi tiêu Gia đình" chạy trên nền tảng Flask (Python 3.11), sử dụng cơ sở dữ liệu SQLite, chạy cục bộ trên hệ điều hành Windows và Linux (localhost) và sẵn sàng để quản lý mã nguồn qua Git/GitHub.
 • Hãy thực hiện các yêu cầu sau:
 1. Đề xuất cấu trúc thư mục dự án:
 - Hãy thiết kế và trình bày một cấu trúc thư mục chuẩn, tối ưu cho mô hình Flask (MVC / App Factory) sao cho khoa học, dễ bảo trì, dễ mở rộng tính năng và thuận tiện cho việc commit lên GitHub.
@@ -10,4 +10,4 @@
 - Các chức năng nghiệp vụ: Quản lý tài khoản, đăng ký/sửa/xóa khoản chi, thống kê theo thời gian, cảnh báo vượt hạn mức và xuất dữ liệu ra tệp Excel.
 - Giao diện HTML (Jinja2) sử dụng Bootstrap 5 đẹp mắt, trực quan.
 - Tệp requirements.txt chứa danh sách các thư viện cần thiết.
-Hướng dẫn các bước chạy lệnh cụ thể trên Windows (cmd/PowerShell) để khởi tạo CSDL (seed data) và chạy server.
+Hướng dẫn các bước chạy lệnh cụ thể trên Windows (cmd/PowerShell) và Linux để khởi tạo CSDL (seed data) và chạy server.
