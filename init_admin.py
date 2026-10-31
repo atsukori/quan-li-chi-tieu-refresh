@@ -96,7 +96,7 @@ def main():
         if member_role is None:
             member_role = Role(
                 roleName="user",
-                description="Ghi nhận và theo dõi giao dịch cá nhân, giao dịch quỹ chung.",
+                description="Ghi nhận giao dịch cá nhân và theo dõi quỹ chung của tập thể.",
             )
             db.session.add(member_role)
 
