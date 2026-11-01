@@ -6,12 +6,12 @@ Các thành viên trong tập thể được cấp tài khoản cá nhân để 
 4. Các chức năng có trong dự án:
 • Đăng nhập và phân quyền (thành viên / quản trị viên)
 • Quản lí tài khoản thành viên (tạo, khóa/mở khóa, cập nhật thông tin)
-• Quản lí danh mục chi tiêu (phân loại các khoản chi phí sinh hoạt, học tập, hoạt động, công tác, giải trí...)
+• Quản lí danh mục thu/chi (thêm, sửa, ẩn; xóa danh mục chưa được giao dịch sử dụng)
 • Ghi nhận giao dịch thu/chi (thêm, sửa, xóa)
 • Thiết lập và cập nhật hạn mức chi tiêu (theo tuần, tháng, quý hoặc theo từng quỹ)
 • Thống kê và báo cáo tài chính (theo ngày, tuần, tháng, năm với bộ lọc linh hoạt theo nhóm / đơn vị)
 • Xuất dữ liệu báo cáo ra tệp Excel (*.xlsx) hoặc CSV
-Phạm vi triển khai hiện tại: phần mềm hỗ trợ hai nguồn tiền `personal` (tiền cá nhân) và `common` (quỹ chung). “Ngân sách đơn vị” là yêu cầu trong mô tả ban đầu nhưng chưa có giá trị nguồn tiền riêng trong mã nguồn. Hạn mức hiện hỗ trợ theo tuần, tháng và quý.
+Phạm vi triển khai hiện tại: phần mềm hỗ trợ `personal` (tiền cá nhân), `common` (quỹ chung) và `unit` (ngân sách đơn vị). Hạn mức hỗ trợ theo tuần, tháng và quý; các nguồn chung hiển thị cho mọi thành viên.
 5. Dữ liệu: Cơ sở dữ liệu
 Hệ thống sử dụng cơ sở dữ liệu gồm các bảng và liên kết chính:
 Bảng User (quản lí thông tin người dùng)
@@ -80,6 +80,8 @@ Bảng Budget (quản lí hạn mức chi tiêu)
 
 11. Phạm vi của phiên bản hiện tại:
 • Có đăng nhập, phân quyền admin/user, quản lý tài khoản và danh mục, CRUD giao dịch, hạn mức tuần/tháng/quý, dashboard, báo cáo và xuất Excel/CSV.
-• Nguồn tiền trong mã nguồn chỉ có `personal` và `common`; chưa có ngân sách đơn vị, nhiều tổ chức hoặc nhiều quỹ riêng.
-• Giao dịch được nhập thủ công; chưa có import Excel trực tiếp hoặc cảnh báo trùng giao dịch.
+• Nguồn tiền gồm `personal`, `common` và `unit`; chưa hỗ trợ nhiều tổ chức hoặc nhiều đơn vị độc lập trong cùng hệ thống.
+• Có import `.xlsx` theo mẫu sau bước xem trước, cảnh báo giao dịch trùng, phân trang danh sách và audit log các thay đổi tài chính/quản trị.
+• Sao lưu SQLite có thể tạo từ giao diện quản trị; khôi phục qua giao diện chưa được hỗ trợ.
+• Bootstrap, Bootstrap Icons và Chart.js được đóng gói cục bộ để giao diện chạy không cần CDN.
 • Database mặc định là SQLite. Trên Linux, launcher Admin giữ nguyên dữ liệu đã có; launcher demo chỉ reset sau khi người dùng xác nhận.

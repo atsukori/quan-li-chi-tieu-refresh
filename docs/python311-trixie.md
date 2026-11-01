@@ -71,6 +71,8 @@ cd /duong/dan/den/thu_muc_du_an
 
 `requirements.txt` cài Waitress cùng các thư viện ứng dụng. Khi `FLASK_DEBUG=0` (mặc định), `run.py` dùng Waitress; launcher Linux đặt `FLASK_DEBUG=0`, bind `0.0.0.0:5000` để truy cập trong LAN.
 
+Bootstrap, Bootstrap Icons và Chart.js được đóng gói trong `app/static/vendor/`, nên giao diện không cần truy cập CDN. Chỉ cần Internet lúc đầu để tải package Python; sau khi cài `requirements.txt`, ứng dụng có thể chạy trong mạng nội bộ không có Internet.
+
 ```bash
 FLASK_HOST=0.0.0.0 FLASK_PORT=5000 FLASK_DEBUG=0 .venv/bin/python run.py
 ```
@@ -82,7 +84,7 @@ Hoặc dùng script sẵn có:
 ./run_demo.sh
 ```
 
-`run_admin.sh` chỉ khởi tạo admin nếu database chưa có dữ liệu; lần chạy sau sẽ giữ nguyên database. `run_demo.sh` xóa database demo cũ chỉ sau khi bạn xác nhận. Sao lưu database trước khi thử các thao tác reset bằng `python backup_db.py`; bản sao lưu nằm trong `instance/backups/`.
+`run_admin.sh` chỉ khởi tạo admin nếu database chưa có dữ liệu; lần chạy sau sẽ giữ nguyên database. `run_demo.sh` xóa database demo cũ chỉ sau khi bạn xác nhận. Có thể sao lưu bằng `python backup_db.py` hoặc vào **Quản trị → Sao lưu database**; bản sao lưu nằm trong `instance/backups/`. Khôi phục qua giao diện chưa được hỗ trợ.
 
 ## Gợi ý nhanh nếu muốn làm lại từ đầu
 

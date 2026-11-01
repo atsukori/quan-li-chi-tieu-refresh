@@ -11,21 +11,24 @@
 - Mật khẩu được băm bằng cơ chế của Werkzeug, không lưu mật khẩu dạng văn bản gốc.
 - Hai vai trò: `admin` (quản trị viên) và `user` (thành viên).
 - Quản trị viên có thể tạo tài khoản, sửa tên, đổi mật khẩu, phân quyền và khóa/mở khóa tài khoản.
-- Thành viên xem được giao dịch cá nhân của mình và giao dịch thuộc quỹ chung. Quản trị viên có thể xem toàn bộ giao dịch.
+- Thành viên xem được giao dịch cá nhân của mình và các giao dịch dùng chung thuộc quỹ chung hoặc ngân sách đơn vị. Quản trị viên có thể xem toàn bộ giao dịch.
 - Mỗi biểu mẫu POST đều được bảo vệ bằng CSRF token. Thành viên chỉ được sửa/xóa giao dịch do chính mình tạo; quản trị viên có quyền quản lý mọi giao dịch.
 
 ### Giao dịch và danh mục
 - Ghi nhận cả **thu nhập** và **chi tiêu**. Loại giao dịch được xác định theo loại danh mục.
 - Thêm, sửa và xóa giao dịch; thông tin gồm ngày, số tiền, danh mục, mục đích/ghi chú và nguồn tiền.
-- Nguồn tiền hiện hỗ trợ `personal` (cá nhân) và `common` (quỹ chung tập thể / tổ chức). “Ngân sách đơn vị” trong yêu cầu ban đầu chưa được triển khai thành nguồn riêng.
+- Nguồn tiền hỗ trợ `personal` (cá nhân), `common` (quỹ chung) và `unit` (ngân sách đơn vị). Hai nguồn dùng chung được hiển thị cho mọi thành viên.
+- Cảnh báo giao dịch trùng ngày, số tiền, danh mục và nguồn; nguồn cá nhân so sánh cùng người ghi nhận, còn nguồn dùng chung so sánh toàn nguồn. Người dùng có thể kiểm tra rồi xác nhận nếu đây là giao dịch riêng.
+- Danh sách giao dịch được phân trang 25 dòng mỗi trang.
+- Quản trị viên có thể import tệp `.xlsx` theo mẫu sau bước xem trước (tối đa 8 MB / 5.000 dòng); dòng lỗi và dòng trùng bị bỏ qua, mã giao dịch được CSDL tự tạo. Dữ liệu xem trước hết hạn sau 24 giờ.
 - Từ chối số tiền âm, bằng 0, không hợp lệ hoặc vượt giới hạn; ngày và danh mục cũng được kiểm tra phía máy chủ.
 - Hỗ trợ lọc lịch sử theo ngày bắt đầu/kết thúc, loại giao dịch, nguồn tiền, danh mục và thành viên (đối với quản trị viên).
-- Quản trị viên có thể thêm hoặc ẩn danh mục thu/chi. Danh mục đã được dùng trong lịch sử vẫn được giữ lại để đảm bảo dữ liệu cũ có thể đọc được.
+- Quản trị viên có thể thêm, sửa, ẩn và xóa danh mục chưa được sử dụng. Danh mục đã gắn với giao dịch không thể xóa cứng để giữ lịch sử; có thể sửa hoặc ẩn. Đổi loại danh mục sẽ ảnh hưởng cách giao dịch cũ được thống kê.
 
 ### Hạn mức và cảnh báo
 - Hạn mức theo tuần (ISO), tháng hoặc quý.
-- Hạn mức cho từng thành viên hoặc cho quỹ chung.
-- Tự tính tổng chi trong kỳ và tỷ lệ sử dụng hạn mức; cảnh báo trên giao diện khi tổng chi vượt hạn mức.
+- Hạn mức cho từng thành viên, quỹ chung hoặc ngân sách đơn vị.
+- Tự tính tổng chi trong kỳ và tỷ lệ sử dụng hạn mức; cảnh báo khi đạt từ 80% và khi vượt hạn mức.
 - Hạn mức chỉ cộng các giao dịch có danh mục loại `expense`, không cộng thu nhập.
 
 ### Báo cáo và xuất dữ liệu
@@ -33,6 +36,19 @@
 - Tổng hợp tổng thu, tổng chi, chênh lệch thu - chi, chi tiêu theo ngày và theo danh mục.
 - Xuất báo cáo giao dịch ra **Excel (`.xlsx`)** hoặc **CSV UTF-8**. File Excel gồm sheet tổng quan và sheet giao dịch.
 - Bảng điều khiển hiển thị chỉ số tháng hiện tại, biểu đồ chi tiêu theo ngày, hạn mức đang hiệu lực và các giao dịch gần đây.
+- Báo cáo phân trang chi tiết 25 dòng mỗi trang; số liệu tổng hợp và tệp xuất vẫn tính toàn bộ giao dịch theo bộ lọc.
+
+### Audit log và sao lưu
+- Nhật ký quản trị ghi nhận thay đổi tài khoản, danh mục, hạn mức, giao dịch, import và sao lưu; không ghi nội dung mật khẩu.
+- Quản trị viên tạo và tải bản sao SQLite đã kiểm tra toàn vẹn từ menu **Quản trị → Sao lưu database**. Bản sao cũng được giữ trong `instance/backups/`; khôi phục qua giao diện chưa được hỗ trợ.
+
+### Chạy giao diện offline
+- Bootstrap, Bootstrap Icons và Chart.js được đóng gói trong `app/static/vendor/`; giao diện không cần truy cập CDN sau khi cài package Python.
+
+### Sao lưu database
+- Quản trị viên có thể tạo bản SQLite từ menu **Quản trị → Sao lưu database**.
+- Bản sao được kiểm tra tính toàn vẹn, lưu vào `instance/backups/` trên máy chủ và gửi xuống trình duyệt. Mỗi lần tạo giữ lại một file mới; cần quản lý dung lượng và lưu bản cần giữ ở thiết bị khác.
+- Khôi phục từ giao diện chưa được hỗ trợ; hiện cần dừng ứng dụng và khôi phục thủ công.
 
 ## 2. Công nghệ
 
@@ -56,8 +72,10 @@ quan-li-chi-tieu-refresh/
 ├── app/
 │   ├── __init__.py             # create_app(), đăng ký extension/blueprint/filter
 │   ├── config.py               # Cấu hình Flask và SQLite
+│   ├── backups.py              # Tạo và kiểm tra bản sao lưu SQLite
+│   ├── importer.py             # Đọc, kiểm tra và áp dụng import Excel
 │   ├── extensions.py           # db, login_manager, csrf
-│   ├── models.py               # Role, User, Category, Expense, Budget
+│   ├── models.py               # Role, User, Category, Expense, Budget, AuditLog
 │   ├── utils.py                # Phân quyền, kiểm tra dữ liệu, tính hạn mức
 │   ├── auth/
 │   │   └── routes.py           # Đăng nhập / đăng xuất
@@ -70,9 +88,11 @@ quan-li-chi-tieu-refresh/
 │   ├── reports/
 │   │   └── routes.py           # Báo cáo, xuất XLSX / CSV
 │   ├── admin/
-│   │   └── routes.py           # Tài khoản và danh mục
-│   ├── templates/              # Giao diện Jinja2
-│   └── static/css/style.css    # CSS tùy chỉnh
+│   │   └── routes.py           # Tài khoản, danh mục, sao lưu, import và audit log
+│   ├── templates/              # Giao diện Jinja2, gồm các trang quản trị danh mục
+│   └── static/
+│       ├── css/style.css       # CSS tùy chỉnh
+│       └── vendor/             # Bootstrap, Bootstrap Icons, Chart.js dùng offline
 ├── instance/
 │   └── .gitkeep                # SQLite và bản sao lưu được lưu cục bộ, không đưa lên Git
 ├── data/
@@ -133,7 +153,7 @@ Cặp (`nameCategory`, `type`) là duy nhất.
 | `date` | Date | Ngày giao dịch |
 | `amount` | Numeric(14,2) | Số tiền dương; loại giao dịch lấy từ `Category.type` |
 | `purpose` | String | Mục đích / ghi chú |
-| `source` | String | `personal` hoặc `common` |
+| `source` | String | `personal`, `common` hoặc `unit` |
 | `created_at`, `updated_at` | DateTime, bổ sung | Thời điểm tạo / cập nhật |
 
 ### `Budget` — hạn mức
@@ -141,11 +161,11 @@ Cặp (`nameCategory`, `type`) là duy nhất.
 | Trường | Kiểu / ràng buộc | Ý nghĩa |
 |---|---|---|
 | `idBudget` | Integer, PK | Mã hạn mức |
-| `idUser` | Integer, FK → `User.idUser`, nullable | Thành viên được áp dụng; `NULL` nếu là quỹ chung |
+| `idUser` | Integer, FK → `User.idUser`, nullable | Thành viên được áp dụng; `NULL` nếu là hạn mức dùng chung |
 | `amountLimit` | Numeric(14,2) | Hạn mức tối đa |
 | `month` | Integer, nullable | Tháng hoặc tháng bắt đầu của kỳ |
 | `year` | Integer | Năm áp dụng |
-| `source` | String, bổ sung | `personal` hoặc `common` |
+| `source` | String, bổ sung | `personal`, `common` hoặc `unit` |
 | `period_type` | String, bổ sung | `weekly`, `monthly` hoặc `quarterly` |
 | `period_number` | Integer, bổ sung | Số tuần ISO, tháng hoặc quý |
 | `created_at` | DateTime, bổ sung | Thời điểm tạo hạn mức |
@@ -158,19 +178,32 @@ User 1 ───── n Expense
 Category 1 ─ n Expense
 User 1 ───── n Budget (hạn mức cá nhân)
 Budget với idUser = NULL (hạn mức quỹ chung)
+AuditLog lưu nhật ký thao tác quản trị, liên kết người thực hiện nếu tài khoản còn tồn tại
 ```
+
+### `AuditLog` — nhật ký thao tác
+
+| Trường | Ý nghĩa |
+|---|---|
+| `actor_id`, `actor_name` | Tài khoản thực hiện và tên đăng nhập được chụp lại tại thời điểm thao tác |
+| `action` | `create`, `update`, `delete`, `activate`, `deactivate`, `import` hoặc `backup` |
+| `entity_type`, `entity_id` | Loại đối tượng và mã đối tượng liên quan |
+| `details` | Chi tiết JSON; không lưu giá trị mật khẩu |
+| `created_at` | Thời điểm ghi nhật ký |
+
+Bảng này được tạo bổ sung an toàn khi khởi động để hỗ trợ các database cũ; các bảng nghiệp vụ hiện có không bị thay đổi.
 
 Mật khẩu được lưu dưới dạng chuỗi băm. Không lưu dữ liệu đăng nhập thô vào CSDL.
 
 ### Mẫu Excel thu thập dữ liệu
 
-Tệp [`data/mau_cau_truc_du_lieu.xlsx`](data/mau_cau_truc_du_lieu.xlsx) có các sheet hướng dẫn, giao dịch mẫu (kèm các dòng trống để điền) và danh mục tham khảo. Tệp được cung cấp để thu thập/kiểm tra cấu trúc dữ liệu; ứng dụng hiện **chưa hỗ trợ import Excel trực tiếp**. Dữ liệu demo thực sự trong SQLite được tạo bằng `python seed.py`.
+Tệp [`data/mau_cau_truc_du_lieu.xlsx`](data/mau_cau_truc_du_lieu.xlsx) có các sheet hướng dẫn, giao dịch mẫu (kèm các dòng trống để điền) và danh mục tham khảo. Quản trị viên có thể nhập sheet “Giao dịch” trực tiếp sau bước xem trước; cần đối chiếu đúng mã thành viên và danh mục trong CSDL. Dữ liệu demo thực sự trong SQLite được tạo bằng `python seed.py`.
 
 ## 5. Yêu cầu trước khi cài đặt
 
 - Windows 10/11.
 - Python **3.11.x** đã cài đặt và có thể gọi bằng lệnh `py -3.11` hoặc `python`.
-- Kết nối Internet ở bước đầu để tải các package Python và thư viện giao diện từ CDN.
+- Kết nối Internet ở bước đầu để tải các package Python; các thư viện giao diện đã được đóng gói trong dự án.
 - Git nếu muốn commit và đẩy mã nguồn lên GitHub.
 
 Kiểm tra Python:
@@ -367,17 +400,17 @@ Chạy thủ công trên Windows hoặc Linux:
 python run.py
 ```
 
-Mặc định app nghe trên `127.0.0.1:5000`. Muốn truy cập LAN trên Windows, đặt `FLASK_HOST=0.0.0.0` và giới hạn truy cập bằng firewall. Bootstrap, Bootstrap Icons và Chart.js hiện tải từ CDN nên trình duyệt cần Internet để hiển thị đầy đủ giao diện.
+Mặc định app nghe trên `127.0.0.1:5000`. Muốn truy cập LAN trên Windows, đặt `FLASK_HOST=0.0.0.0` và giới hạn truy cập bằng firewall. Bootstrap, Bootstrap Icons và Chart.js được phục vụ từ `app/static/vendor/`, nên giao diện không cần Internet sau khi package Python đã cài xong.
 
 ## 13. Phạm vi và điểm cần phát triển tiếp
 
 - Giao dịch hiện được nhập thủ công; chưa kết nối API ngân hàng/ví điện tử.
 - Chưa có ứng dụng điện thoại độc lập hoặc nhận diện hóa đơn qua camera.
 - Chưa hỗ trợ đa tiền tệ, hiện mặc định VNĐ.
-- Chưa có audit log đầy đủ cho mọi thay đổi và chưa tích hợp quy trình quên mật khẩu qua email.
-- Chưa có import Excel trực tiếp; file mẫu chỉ phục vụ thu thập dữ liệu.
-- Nguồn tiền hiện chỉ gồm `personal` và `common`; “ngân sách đơn vị” cần được bổ sung nếu vẫn là yêu cầu bắt buộc.
-- Khi mở rộng quy mô, nên bổ sung migration database, phân trang cho danh sách giao dịch lớn, kiểm thử nghiệp vụ sâu hơn và dùng PostgreSQL nếu tải ghi đồng thời tăng.
+- Audit log hiện ghi nhận các thao tác quản trị và thay đổi tài chính đã liệt kê; chưa có luồng quên mật khẩu qua email.
+- Import hiện hỗ trợ `.xlsx` theo mẫu và giới hạn upload 8 MB / 5.000 dòng; chưa hỗ trợ CSV hoặc ánh xạ cột tùy ý.
+- Nguồn `unit` là phạm vi dùng chung trong một CSDL, chưa hỗ trợ nhiều đơn vị độc lập trong cùng hệ thống.
+- Khi đổi cấu trúc bảng trong tương lai, nên bổ sung công cụ migration; khi tải ghi đồng thời tăng, cân nhắc PostgreSQL.
 
 ## 14. Tài liệu tham khảo kỹ thuật
 

@@ -18,8 +18,10 @@ Ghi chú: Danh sách được đọc từ workspace local. Bỏ qua .git, venv, 
 |-- app/
 |   |-- __init__.py
 |   |-- config.py
+|   |-- backups.py
+|   |-- importer.py
 |   |-- extensions.py
-|   |-- models.py
+|   |-- models.py                 # Role, User, Category, Expense, Budget, AuditLog
 |   |-- utils.py
 |   |-- admin/
 |   |   |-- __init__.py
@@ -40,12 +42,18 @@ Ghi chú: Danh sách được đọc từ workspace local. Bỏ qua .git, venv, 
 |   |   |-- __init__.py
 |   |   `-- routes.py
 |   |-- static/
-|   |   `-- css/
-|   |       `-- style.css
+|   |   |-- css/
+|   |   |   `-- style.css
+|   |   `-- vendor/               # Bootstrap, Bootstrap Icons, Chart.js (offline)
 |   `-- templates/
 |       |-- base.html
 |       |-- admin/
+|       |   |-- audit_log.html
 |       |   |-- categories.html
+|       |   |-- category_form.html
+|       |   |-- backup.html
+|       |   |-- import_transactions.html
+|       |   |-- import_preview.html
 |       |   |-- user_form.html
 |       |   `-- users.html
 |       |-- auth/
@@ -76,7 +84,8 @@ Ghi chú: Danh sách được đọc từ workspace local. Bỏ qua .git, venv, 
 |-- instance/
 |   |-- .gitkeep
 |   |-- family_expenses.db (database local, bị Git bỏ qua)
-|   `-- backups/ (được tạo khi chạy backup_db.py, bị Git bỏ qua)
+|   |-- backups/ (bản sao database, bị Git bỏ qua)
+|   `-- imports/ (dữ liệu xem trước tạm, bị Git bỏ qua)
 `-- tests/
     `-- test_app.py
 
