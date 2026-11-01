@@ -1,1 +1,1 @@
-Quản lí bởi ChatGPT
+Quản lí bởi ChatGPT và Codex
