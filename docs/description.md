@@ -1,6 +1,6 @@
-# Hệ thống Quản lý Chi tiêu Gia đình
+# Hệ thống Quản lý Chi tiêu cho Tập thể / Tổ chức
 
-Ứng dụng web quản lý thu nhập và chi tiêu trong gia đình, xây dựng bằng **Python 3.11, Flask, Flask-SQLAlchemy, SQLite, Flask-Login và Bootstrap 5**. Ứng dụng chạy cục bộ trên Windows tại `http://127.0.0.1:5000`, có cấu trúc theo **Application Factory + Blueprint** để thuận tiện bảo trì và mở rộng.
+Ứng dụng web quản lý thu, chi, hạn mức và báo cáo tài chính cho tập thể / tổ chức, xây dựng bằng **Python 3.11, Flask, Flask-SQLAlchemy, SQLite, Flask-Login, Waitress và Bootstrap 5**. Ứng dụng dùng cấu trúc **Application Factory + Blueprint**, chạy trên Windows và Raspberry Pi; host và port được cấu hình bằng biến môi trường.
 
 > Đây là phiên bản phục vụ học tập và chạy thử trên máy cá nhân. Tài khoản mẫu và dữ liệu được tạo bởi `seed.py` chỉ để demo; hãy đổi mật khẩu và cấu hình `SECRET_KEY` trước khi đưa vào sử dụng với dữ liệu thật.
 
@@ -17,7 +17,7 @@
 ### Giao dịch và danh mục
 - Ghi nhận cả **thu nhập** và **chi tiêu**. Loại giao dịch được xác định theo loại danh mục.
 - Thêm, sửa và xóa giao dịch; thông tin gồm ngày, số tiền, danh mục, mục đích/ghi chú và nguồn tiền.
-- Nguồn tiền gồm `personal` (cá nhân) và `common` (quỹ chung gia đình).
+- Nguồn tiền hiện hỗ trợ `personal` (cá nhân) và `common` (quỹ chung tập thể / tổ chức). “Ngân sách đơn vị” trong yêu cầu ban đầu chưa được triển khai thành nguồn riêng.
 - Từ chối số tiền âm, bằng 0, không hợp lệ hoặc vượt giới hạn; ngày và danh mục cũng được kiểm tra phía máy chủ.
 - Hỗ trợ lọc lịch sử theo ngày bắt đầu/kết thúc, loại giao dịch, nguồn tiền, danh mục và thành viên (đối với quản trị viên).
 - Quản trị viên có thể thêm hoặc ẩn danh mục thu/chi. Danh mục đã được dùng trong lịch sử vẫn được giữ lại để đảm bảo dữ liệu cũ có thể đọc được.
@@ -40,6 +40,7 @@
 |---|---|
 | Ngôn ngữ | Python 3.11 |
 | Web framework | Flask 3.1 |
+| WSGI server | Waitress 3.0.2 khi `FLASK_DEBUG=0` |
 | Kiến trúc | Flask Application Factory + Blueprint; tách route, model, template và tiện ích nghiệp vụ |
 | ORM / CSDL | Flask-SQLAlchemy, SQLAlchemy 2.x, SQLite |
 | Xác thực | Flask-Login, Werkzeug password hashing |
@@ -51,7 +52,7 @@
 ## 3. Cấu trúc thư mục
 
 ```text
-family_expense_manager/
+quan-li-chi-tieu-refresh/
 ├── app/
 │   ├── __init__.py             # create_app(), đăng ký extension/blueprint/filter
 │   ├── config.py               # Cấu hình Flask và SQLite
@@ -73,7 +74,7 @@ family_expense_manager/
 │   ├── templates/              # Giao diện Jinja2
 │   └── static/css/style.css    # CSS tùy chỉnh
 ├── instance/
-│   └── .gitkeep                # SQLite sẽ được tạo tại thư mục instance/
+│   └── .gitkeep                # SQLite và bản sao lưu được lưu cục bộ, không đưa lên Git
 ├── data/
 │   └── mau_cau_truc_du_lieu.xlsx # Mẫu Excel cấu trúc giao dịch để thu thập dữ liệu
 ├── tests/
@@ -81,7 +82,8 @@ family_expense_manager/
 ├── .env.example                # Mẫu cấu hình môi trường
 ├── .gitignore                  # Loại trừ venv, .env, SQLite, cache
 ├── requirements.txt            # Thư viện chạy ứng dụng
-├── run.py                      # Điểm vào chạy Flask trên localhost
+├── run.py                      # Waitress khi debug tắt; Flask development server khi debug bật
+├── backup_db.py                # Sao lưu SQLite và kiểm tra tính toàn vẹn
 ├── seed.py                     # Tạo CSDL và dữ liệu demo
 └── README.md
 ```
@@ -183,13 +185,13 @@ Nếu lệnh không chạy, hãy cài Python 3.11 từ trang chính thức `http
 
 ### Bước 1 — giải nén hoặc clone dự án
 
-Nếu có file ZIP, giải nén vào một thư mục thuận tiện, ví dụ `D:\Projects\family_expense_manager` rồi mở Terminal tại thư mục đó.
+Nếu có file ZIP, giải nén vào một thư mục thuận tiện, ví dụ `D:\Projects\quan-li-chi-tieu-refresh` rồi mở Terminal tại thư mục đó.
 
 Nếu dự án đã nằm trên GitHub:
 
 ```powershell
 git clone <URL_REPOSITORY>
-cd family_expense_manager
+cd quan-li-chi-tieu-refresh
 ```
 
 ### Bước 2 — tạo môi trường ảo
@@ -240,13 +242,13 @@ Copy-Item .env.example .env
 copy .env.example .env
 ```
 
-Mở `.env` và thay `SECRET_KEY` bằng một chuỗi ngẫu nhiên dài. Ví dụ có thể tạo khóa ngẫu nhiên bằng lệnh:
+Mở `.env` và thay `SECRET_KEY` bằng một chuỗi ngẫu nhiên dài. Giữ `FLASK_DEBUG=0` để chạy Waitress; chỉ đặt `FLASK_DEBUG=1` tạm thời khi cần debug local. Ví dụ có thể tạo khóa ngẫu nhiên bằng lệnh:
 
 ```powershell
 python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
-Dán kết quả vào `SECRET_KEY` trong `.env`. Giữ `DATABASE_URL=sqlite:///family_expenses.db` nếu muốn đặt CSDL tại `instance/family_expenses.db`. Với mục tiêu chạy local, có thể để `FLASK_DEBUG=1`; không bật debug khi chạy trên server.
+Dán kết quả vào `SECRET_KEY` trong `.env`. Giữ `DATABASE_URL=sqlite:///family_expenses.db` nếu muốn đặt CSDL tại `instance/family_expenses.db`. Có thể đặt `FLASK_HOST` và `FLASK_PORT`; mặc định ứng dụng chỉ nghe trên `127.0.0.1:5000`. Launcher Linux bật host `0.0.0.0` để truy cập LAN và luôn tắt debug.
 
 ### Bước 5 — tạo CSDL và dữ liệu mẫu
 
@@ -289,7 +291,19 @@ Mở trình duyệt tại:
 
 Dừng server bằng `Ctrl + C` trong terminal.
 
-## 7. Tài khoản demo
+## 7. Sao lưu và khôi phục SQLite
+
+Khi ứng dụng đang chạy hoặc đã dừng, tạo bản sao lưu nhất quán bằng SQLite backup API:
+
+```powershell
+python backup_db.py
+```
+
+Bản sao lưu được ghi vào `instance/backups/` và kiểm tra bằng `PRAGMA integrity_check`. Thư mục này bị loại khỏi Git. Hãy chép bản sao lưu sang thiết bị lưu trữ khác để phòng hỏng hoặc mất Raspberry Pi.
+
+Để khôi phục, dừng ứng dụng, giữ lại database hiện tại để có thể quay lui, rồi chép file `.sqlite3` cần khôi phục về đúng đường dẫn SQLite đang dùng (mặc định `instance/family_expenses.db`). Khởi động lại ứng dụng và đăng nhập kiểm tra dữ liệu.
+
+## 8. Tài khoản demo
 
 | Vai trò | Tên đăng nhập | Mật khẩu ban đầu |
 |---|---|---|
@@ -301,7 +315,7 @@ Dừng server bằng `Ctrl + C` trong terminal.
 
 Đây là thông tin demo cố định để tiện chấm thử. Đổi mật khẩu hoặc tạo tài khoản mới trước khi đưa dữ liệu thật vào hệ thống.
 
-## 8. Luồng sử dụng gợi ý
+## 9. Luồng sử dụng gợi ý
 
 1. Đăng nhập bằng tài khoản `admin`.
 2. Vào **Quản trị → Tài khoản thành viên** để tạo hoặc khóa/mở khóa tài khoản.
@@ -311,12 +325,12 @@ Dừng server bằng `Ctrl + C` trong terminal.
 6. Theo dõi cảnh báo trên bảng điều khiển và trang hạn mức.
 7. Vào **Báo cáo** để lọc thời gian, xem tổng thu/chi rồi chọn xuất Excel hoặc CSV.
 
-## 9. Kiểm tra nhanh
+## 10. Kiểm tra nhanh
 
 Kiểm tra cú pháp tất cả file Python:
 
 ```powershell
-python -m compileall app run.py seed.py
+python -m compileall app run.py seed.py init_admin.py backup_db.py
 ```
 
 Nếu đã cài `pytest`, có thể chạy kiểm thử:
@@ -326,56 +340,46 @@ python -m pip install pytest
 python -m pytest
 ```
 
-Kiểm thử tập trung vào việc tạo ứng dụng, đăng nhập, phân quyền và kiểm tra dữ liệu cơ bản.
+Kiểm thử tập trung vào tạo ứng dụng, đăng nhập, phân quyền, giới hạn giao dịch theo thành viên/nguồn quỹ và kiểm tra số tiền.
 
-## 10. Git và GitHub
+## 11. Git và GitHub
 
 Tệp `.gitignore` đã loại trừ `.venv`, `.env`, CSDL SQLite, cache Python và cấu hình IDE để tránh đưa bí mật hoặc dữ liệu cá nhân lên GitHub.
 
-Khởi tạo repository mới:
+Repository này dùng `chatgpt-work` làm branch làm việc. Trước khi commit, kiểm tra branch và `git status`; không đưa `.env`, SQLite hoặc bản sao lưu vào Git.
 
 ```powershell
-git init
-git add .
+git switch chatgpt-work
 git status
-git commit -m "Initial commit: family expense manager"
-git branch -M main
-git remote add origin <URL_REPOSITORY>
-git push -u origin main
 ```
 
-Trước khi `git add .`, kiểm tra `git status` để chắc chắn `.env` và file CSDL không xuất hiện trong danh sách commit. Đừng xóa các quy tắc `.gitignore` cho `.env` hoặc SQLite nếu dùng dữ liệu thật.
+## 12. Chạy trên Raspberry Pi / LAN
 
-## 11. Triển khai lên server sau này
+Tạo `.env` với `SECRET_KEY` riêng, `FLASK_DEBUG=0`, và database SQLite trên bộ nhớ lưu trữ bền vững. `run_admin.sh` khởi tạo admin chỉ khi database chưa có dữ liệu; nếu đã có dữ liệu thì giữ nguyên. `run_demo.sh` yêu cầu xác nhận trước khi xóa và tạo lại dữ liệu demo.
 
-Phiên bản hiện tại hướng tới localhost. Khi triển khai thật, cần thực hiện tối thiểu các bước sau:
+Launcher Linux đặt `FLASK_HOST=0.0.0.0`, `FLASK_PORT=5000` và `FLASK_DEBUG=0`. Khi debug tắt, `run.py` dùng Waitress với hai thread. Chỉ mở cổng trong mạng tin cậy; không chuyển tiếp trực tiếp ra Internet.
 
-1. **Cấu hình production:** tạo `SECRET_KEY` riêng, đặt `FLASK_DEBUG=0`, không commit `.env`, không dùng các mật khẩu demo.
-2. **Máy chủ WSGI:** trên Windows có thể dùng Waitress; trên Linux thường dùng Gunicorn sau reverse proxy như Nginx. Không dùng Flask development server cho production.
-3. **HTTPS:** bật TLS tại reverse proxy hoặc nền tảng hosting; đặt `SESSION_COOKIE_SECURE=1` sau khi chỉ phục vụ HTTPS (giữ `0` khi chạy localhost qua HTTP).
-4. **Cơ sở dữ liệu:** SQLite thích hợp cho demo hoặc ứng dụng nhỏ, một instance. Với nhiều người dùng đồng thời, nhiều worker hoặc yêu cầu độ sẵn sàng cao, nên cân nhắc PostgreSQL và quản lý migration.
-5. **Lưu trữ bền vững:** dùng ổ đĩa hoặc volume persistent cho file CSDL nếu vẫn dùng SQLite; lập lịch sao lưu và thử khôi phục bản sao lưu.
-6. **Bảo mật vận hành:** thay mật khẩu mặc định, giới hạn quyền truy cập server, ghi log, cập nhật package và kiểm tra chính sách dữ liệu cá nhân.
-7. **Tài nguyên tĩnh:** CDN Bootstrap/Chart.js cần Internet ở máy khách. Khi muốn chạy offline, tải các tài nguyên này về `app/static/` và đổi các thẻ `<link>`/`<script>` sang file local.
+Khi chỉ chạy HTTP trong LAN, giữ `SESSION_COOKIE_SECURE=0`; chỉ đặt `1` nếu ứng dụng được phục vụ hoàn toàn qua HTTPS.
 
-Ví dụ lệnh khởi chạy thử với Waitress trên Windows (cần cài thêm `waitress`):
+Chạy thủ công trên Windows hoặc Linux:
 
 ```powershell
-pip install waitress
-waitress-serve --listen=127.0.0.1:8000 run:app
+python run.py
 ```
 
-Địa chỉ `127.0.0.1` chỉ cho máy hiện tại truy cập. Khi triển khai trên server, hãy chọn địa chỉ bind, firewall và reverse proxy theo kiến trúc hosting thực tế; không mở trực tiếp dịch vụ debug ra Internet.
+Mặc định app nghe trên `127.0.0.1:5000`. Muốn truy cập LAN trên Windows, đặt `FLASK_HOST=0.0.0.0` và giới hạn truy cập bằng firewall. Bootstrap, Bootstrap Icons và Chart.js hiện tải từ CDN nên trình duyệt cần Internet để hiển thị đầy đủ giao diện.
 
-## 12. Phạm vi và điểm cần phát triển tiếp
+## 13. Phạm vi và điểm cần phát triển tiếp
 
 - Giao dịch hiện được nhập thủ công; chưa kết nối API ngân hàng/ví điện tử.
 - Chưa có ứng dụng điện thoại độc lập hoặc nhận diện hóa đơn qua camera.
 - Chưa hỗ trợ đa tiền tệ, hiện mặc định VNĐ.
 - Chưa có audit log đầy đủ cho mọi thay đổi và chưa tích hợp quy trình quên mật khẩu qua email.
+- Chưa có import Excel trực tiếp; file mẫu chỉ phục vụ thu thập dữ liệu.
+- Nguồn tiền hiện chỉ gồm `personal` và `common`; “ngân sách đơn vị” cần được bổ sung nếu vẫn là yêu cầu bắt buộc.
 - Khi mở rộng quy mô, nên bổ sung migration database, phân trang cho danh sách giao dịch lớn, kiểm thử nghiệp vụ sâu hơn và dùng PostgreSQL nếu tải ghi đồng thời tăng.
 
-## 13. Tài liệu tham khảo kỹ thuật
+## 14. Tài liệu tham khảo kỹ thuật
 
 - Flask: <https://flask.palletsprojects.com/>
 - Flask application factories: <https://flask.palletsprojects.com/en/stable/patterns/appfactories/>

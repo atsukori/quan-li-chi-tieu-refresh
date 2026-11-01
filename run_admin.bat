@@ -14,24 +14,19 @@ if not exist ".venv\Scripts\activate.bat" (
 
 call ".venv\Scripts\activate.bat"
 
-if not exist "instance\family_expenses.db" (
+set "FLASK_DEBUG=0"
+echo.
+echo Initializing an admin account only if the database is empty...
+python init_admin.py --skip-existing
+if errorlevel 1 (
     echo.
-    echo Initializing a clean database with one admin account...
-    python init_admin.py
-    if errorlevel 1 (
-        echo.
-        echo ERROR: Admin initialization failed. The server will not be started.
-        pause
-        exit /b 1
-    )
-) else (
-    echo.
-    echo Existing database found. Skipping initialization to preserve your data.
-    echo If you need to reset to admin-only, run: python init_admin.py --reset
+    echo ERROR: Admin initialization failed. The server will not be started.
+    pause
+    exit /b 1
 )
 
 echo.
-echo Starting Flask at http://127.0.0.1:5000
+echo Starting application at http://127.0.0.1:5000
 python run.py
 set "APP_EXIT_CODE=%ERRORLEVEL%"
 echo.

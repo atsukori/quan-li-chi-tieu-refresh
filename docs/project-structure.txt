@@ -8,6 +8,7 @@ Ghi chú: Danh sách được đọc từ workspace local. Bỏ qua .git, venv, 
 |-- README.md
 |-- requirements.txt
 |-- run.py
+|-- backup_db.py
 |-- run_admin.bat
 |-- run_admin.sh
 |-- run_demo.bat
@@ -69,11 +70,13 @@ Ghi chú: Danh sách được đọc từ workspace local. Bỏ qua .git, venv, 
 |   |-- prompts.docx
 |   |-- prompts.txt
 |   |-- project-structure.txt
+|   |-- python311-trixie.md
 |   |-- quan-li-chi-tieu-refresh.docx
 |   `-- quan-li-chi-tieu-refresh.txt
 |-- instance/
 |   |-- .gitkeep
-|   `-- family_expenses.db
+|   |-- family_expenses.db (database local, bị Git bỏ qua)
+|   `-- backups/ (được tạo khi chạy backup_db.py, bị Git bỏ qua)
 `-- tests/
     `-- test_app.py
 

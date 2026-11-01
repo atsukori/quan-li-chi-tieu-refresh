@@ -7,10 +7,11 @@ Các thành viên trong tập thể được cấp tài khoản cá nhân để 
 • Đăng nhập và phân quyền (thành viên / quản trị viên)
 • Quản lí tài khoản thành viên (tạo, khóa/mở khóa, cập nhật thông tin)
 • Quản lí danh mục chi tiêu (phân loại các khoản chi phí sinh hoạt, học tập, hoạt động, công tác, giải trí...)
-• Đăng kí và quản lia khoản chi tiêu (thêm, sửa, xóa giao dịch thu/chi)
+• Ghi nhận giao dịch thu/chi (thêm, sửa, xóa)
 • Thiết lập và cập nhật hạn mức chi tiêu (theo tuần, tháng, quý hoặc theo từng quỹ)
 • Thống kê và báo cáo tài chính (theo ngày, tuần, tháng, năm với bộ lọc linh hoạt theo nhóm / đơn vị)
 • Xuất dữ liệu báo cáo ra tệp Excel (*.xlsx) hoặc CSV
+Phạm vi triển khai hiện tại: phần mềm hỗ trợ hai nguồn tiền `personal` (tiền cá nhân) và `common` (quỹ chung). “Ngân sách đơn vị” là yêu cầu trong mô tả ban đầu nhưng chưa có giá trị nguồn tiền riêng trong mã nguồn. Hạn mức hiện hỗ trợ theo tuần, tháng và quý.
 5. Dữ liệu: Cơ sở dữ liệu
 Hệ thống sử dụng cơ sở dữ liệu gồm các bảng và liên kết chính:
 Bảng User (quản lí thông tin người dùng)
@@ -53,9 +54,9 @@ Bảng Budget (quản lí hạn mức chi tiêu)
 | 5 | year | - | Năm áp dụng |
 6. Mô tả chi tiết các chức năng:
 • Đăng nhập và phân quyền: Người dùng đăng nhập bằng tài khoản được cấp. Hệ thống phân quyền rõ ràng: Quản trị viên (admin) quản lí toàn bộ hệ thống, tài khoản và hạn mức, thành viên (user) nhập liệu và theo dõi chi tiêu cá nhân/chung theo nhóm hoặc quỹ.
-• Quản lí tài khoản thành viên (admin): Cho phép admin tạo mới tài khoản cho các thành viên trong tậ thể, cập nhật thông tin, khóa hoặc mở khóa tài khoản khi cần thiết.
+• Quản lí tài khoản thành viên (admin): Cho phép admin tạo mới tài khoản cho các thành viên trong tập thể, cập nhật thông tin, khóa hoặc mở khóa tài khoản khi cần thiết.
 • Quản lí danh mục chi tiêu: Cung cấp danh mục các khoản thu/chi chuẩn hóa giúp người dùng dễ dàng phân loại giao dịch theo hoạt động, phòng ban hoặc nhóm chi phí.
-• Đăng kí khoản chi tiêu: Thành viên nhập thông tin chi tiêu hàng ngày (ngày, số tiền, mục đích, nguồn tiền, danh mục). Hệ thống tự động kiểm tra với hạn mức, tính toán số tiền đã chi và số tiền còn lại.
+• Ghi nhận giao dịch: Thành viên nhập thông tin thu/chi hàng ngày (ngày, số tiền, mục đích, nguồn tiền, danh mục). Hệ thống kiểm tra dữ liệu và cảnh báo khi chi tiêu vượt hạn mức.
 • Thiết lập và cập nhật hạn mức: Admin thiết lập hạn mức chi tiêu định kì (tháng/quý) cho từng thành viên, từng nhóm hoặc quỹ chung.
 • Thống kê và báo cáo: Cung cấp cái nhìn tổng quan về tình hình tài chính qua các bộ lọc thời gian linh hoạt (ngày, tuần, tháng, năm) kèm biểu đồ trực quan.
 • Xuất dữ liệu Excel hoặc CSV: Hỗ trợ xuất toàn bộ hoặc một phần lịch sử chi tiêu ra file Excel (*.xlsx) hoặc CSV để lưu trữ hoặc phục vụ phân tích tài chính sâu hơn.
@@ -76,3 +77,9 @@ Bảng Budget (quản lí hạn mức chi tiêu)
 • Phát triển ứng dụng di động để thuận tiện sử dụng mọi lúc mọi nơi.
 • Kết nối API ngân hàng để tự động ghi nhận biến động số dư và giao dịch chi tiêu.
 • Bổ sung tính năng lập quỹ tiết kiệm chung cho các mục tiêu lớn của tập thể / tổ chức (mua sắm, sự kiện, hoạt động, du lịch...).
+
+11. Phạm vi của phiên bản hiện tại:
+• Có đăng nhập, phân quyền admin/user, quản lý tài khoản và danh mục, CRUD giao dịch, hạn mức tuần/tháng/quý, dashboard, báo cáo và xuất Excel/CSV.
+• Nguồn tiền trong mã nguồn chỉ có `personal` và `common`; chưa có ngân sách đơn vị, nhiều tổ chức hoặc nhiều quỹ riêng.
+• Giao dịch được nhập thủ công; chưa có import Excel trực tiếp hoặc cảnh báo trùng giao dịch.
+• Database mặc định là SQLite. Trên Linux, launcher Admin giữ nguyên dữ liệu đã có; launcher demo chỉ reset sau khi người dùng xác nhận.

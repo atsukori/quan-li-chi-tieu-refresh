@@ -57,10 +57,11 @@ esac
 
 export FLASK_HOST=0.0.0.0
 export FLASK_PORT=5000
+export FLASK_DEBUG=0
 
 echo
 echo "Creating demo database..."
 "$PYTHON" "$SCRIPT_DIR/seed.py" --reset
 echo
-echo "Starting Flask at http://0.0.0.0:5000"
+echo "Starting application at http://0.0.0.0:5000"
 "$PYTHON" "$SCRIPT_DIR/run.py"

@@ -42,12 +42,13 @@ PYVER=3.11.18
 wget https://www.python.org/ftp/python/${PYVER}/Python-${PYVER}.tgz
 tar -xf Python-${PYVER}.tgz
 cd Python-${PYVER}
-./configure --prefix=/opt/python-3.11 --enable-optimizations
-make -j"$(nproc)"
+./configure --prefix=/opt/python-3.11
+make -j1
 sudo make altinstall
 ```
 
 `make altinstall` là lựa chọn an toàn vì không ghi đè lên `python3` của hệ thống.
+Pi Zero 2 W có khoảng 512 MB RAM và đang dùng zram; build một job (`-j1`) để giảm áp lực bộ nhớ. Không cài `dphys-swapfile` theo hướng dẫn cũ và không thay Python hệ thống của Trixie.
 
 ### 4) Kiểm tra bản cài đặt
 
@@ -68,8 +69,10 @@ cd /duong/dan/den/thu_muc_du_an
 
 ### 6) Chạy ứng dụng trên Raspberry Pi
 
+`requirements.txt` cài Waitress cùng các thư viện ứng dụng. Khi `FLASK_DEBUG=0` (mặc định), `run.py` dùng Waitress; launcher Linux đặt `FLASK_DEBUG=0`, bind `0.0.0.0:5000` để truy cập trong LAN.
+
 ```bash
-FLASK_HOST=0.0.0.0 FLASK_PORT=5000 .venv/bin/python run.py
+FLASK_HOST=0.0.0.0 FLASK_PORT=5000 FLASK_DEBUG=0 .venv/bin/python run.py
 ```
 
 Hoặc dùng script sẵn có:
@@ -78,6 +81,8 @@ Hoặc dùng script sẵn có:
 ./run_admin.sh
 ./run_demo.sh
 ```
+
+`run_admin.sh` chỉ khởi tạo admin nếu database chưa có dữ liệu; lần chạy sau sẽ giữ nguyên database. `run_demo.sh` xóa database demo cũ chỉ sau khi bạn xác nhận. Sao lưu database trước khi thử các thao tác reset bằng `python backup_db.py`; bản sao lưu nằm trong `instance/backups/`.
 
 ## Gợi ý nhanh nếu muốn làm lại từ đầu
 

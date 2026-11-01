@@ -44,10 +44,11 @@ fi
 
 export FLASK_HOST=0.0.0.0
 export FLASK_PORT=5000
+export FLASK_DEBUG=0
 
 echo
-echo "Resetting database to admin-only state..."
-"$PYTHON" "$SCRIPT_DIR/init_admin.py" --reset
+echo "Initializing admin account only if the database is empty..."
+"$PYTHON" "$SCRIPT_DIR/init_admin.py" --skip-existing
 echo
-echo "Starting Flask at http://0.0.0.0:5000"
+echo "Starting application at http://0.0.0.0:5000"
 "$PYTHON" "$SCRIPT_DIR/run.py"
