@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Nhật ký hoạt động · Chi tiêu Tập thể{% endblock %}
+{% block content %}
+<div class="page-heading mb-4"><p class="eyebrow">QUẢN TRỊ HỆ THỐNG</p><h1 class="page-title">Nhật ký hoạt động</h1><p class="text-secondary mb-0">Lịch sử thay đổi tài khoản, danh mục, hạn mức, giao dịch, import và sao lưu.</p></div>
+<section class="content-card"><div class="table-responsive"><table class="table app-table align-middle"><thead><tr><th>Thời điểm</th><th>Hoạt động</th></tr></thead><tbody>
+{% for row in pagination.items %}<tr><td class="text-nowrap">{{ row.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td><td><div class="fw-semibold">{{ row.summary }}</div><details class="small mt-1"><summary class="text-secondary">Xem thông tin bổ sung</summary><pre class="small text-secondary bg-light rounded p-2 mt-2 mb-0" style="white-space: pre-wrap; overflow-wrap: anywhere; max-height: 12rem; overflow: auto">{{ row.details_pretty }}</pre></details></td></tr>{% else %}<tr><td colspan="2" class="text-center text-secondary py-4">Chưa có hoạt động được ghi nhận.</td></tr>{% endfor %}
+</tbody></table></div>
+{% if pagination.pages > 1 %}<nav class="mt-3" aria-label="Phân trang nhật ký"><ul class="pagination justify-content-end mb-0">{% if pagination.has_prev %}<li class="page-item"><a class="page-link" href="{{ url_for('admin.audit_log', page=pagination.prev_num) }}">Trước</a></li>{% endif %}<li class="page-item disabled"><span class="page-link">{{ pagination.page }} / {{ pagination.pages }}</span></li>{% if pagination.has_next %}<li class="page-item"><a class="page-link" href="{{ url_for('admin.audit_log', page=pagination.next_num) }}">Sau</a></li>{% endif %}</ul></nav>{% endif %}</section>
+{% endblock %}

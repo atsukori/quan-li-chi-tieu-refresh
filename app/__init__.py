@@ -8,7 +8,7 @@ load_dotenv()
 
 from .config import Config
 from .extensions import csrf, db, login_manager
-from .utils import budget_period_label, budget_progress
+from .utils import budget_period_label, budget_progress, source_label
 
 
 def create_app(test_config=None):
@@ -49,6 +49,10 @@ def create_app(test_config=None):
     app.register_blueprint(budgets_bp, url_prefix="/budgets")
     app.register_blueprint(reports_bp, url_prefix="/reports")
 
+    # Add the audit table for existing installations without altering existing tables.
+    with app.app_context():
+        models.AuditLog.__table__.create(db.engine, checkfirst=True)
+
     @login_manager.user_loader
     def load_user(user_id):
         try:
@@ -74,7 +78,7 @@ def create_app(test_config=None):
     @app.context_processor
     def inject_template_helpers():
         today = date.today()
-        return {"budget_period_label": budget_period_label, "budget_progress": budget_progress, "current_year": today.year, "current_month": today.month}
+        return {"budget_period_label": budget_period_label, "budget_progress": budget_progress, "source_label": source_label, "current_year": today.year, "current_month": today.month}
 
     @app.errorhandler(403)
     def forbidden(_error):

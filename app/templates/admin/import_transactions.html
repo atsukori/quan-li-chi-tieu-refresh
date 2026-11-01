@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Nhập giao dịch từ Excel · Chi tiêu Tập thể{% endblock %}
+{% block content %}
+<div class="page-heading mb-4"><p class="eyebrow">QUẢN TRỊ HỆ THỐNG</p><h1 class="page-title">Nhập giao dịch từ Excel</h1><p class="text-secondary mb-0">Tải tệp theo mẫu cấu trúc dữ liệu để kiểm tra trước khi nhập.</p></div>
+<section class="content-card form-card">
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label class="form-label" for="file">Tệp Excel (.xlsx)</label>
+        <input class="form-control" type="file" name="file" id="file" accept=".xlsx" required>
+        <div class="form-text">Cần có sheet “Giao dịch” với các cột idUser, idCategory, date, amount, purpose và source. idExpense được bỏ qua; source nhận personal, common hoặc unit. Dòng trùng/lỗi sẽ không được nhập.</div>
+        <button class="btn btn-primary mt-3" type="submit"><i class="bi bi-search me-1"></i>Xem trước và kiểm tra</button>
+    </form>
+</section>
+{% endblock %}

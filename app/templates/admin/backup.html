@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Sao lưu database · Chi tiêu Tập thể{% endblock %}
+{% block content %}
+<div class="page-heading mb-4">
+    <p class="eyebrow">QUẢN TRỊ HỆ THỐNG</p>
+    <h1 class="page-title">Sao lưu database</h1>
+    <p class="text-secondary mb-0">Tạo một bản sao SQLite nhất quán để tải về và lưu trữ an toàn.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-xl-8">
+        <section class="content-card">
+            <div class="form-section-title mb-3">
+                <span class="form-section-icon"><i class="bi bi-database-down"></i></span>
+                <div>
+                    <h2 class="section-title">Tạo bản sao lưu</h2>
+                    <p class="section-subtitle">Thao tác không thay đổi dữ liệu đang sử dụng.</p>
+                </div>
+            </div>
+            <p class="text-secondary">Bản sao được tạo bằng SQLite backup API, kiểm tra tính toàn vẹn, lưu trong thư mục backup cục bộ của ứng dụng và tải xuống trình duyệt.</p>
+            <form method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-primary" type="submit"><i class="bi bi-download me-2"></i>Tạo và tải bản sao lưu</button>
+            </form>
+        </section>
+    </div>
+    <div class="col-12 col-xl-4">
+        <section class="content-card h-100">
+            <h2 class="section-title mb-3">Lưu ý</h2>
+            <ul class="text-secondary small ps-3 mb-0">
+                <li class="mb-2">Chỉ quản trị viên mới truy cập được chức năng này.</li>
+                <li class="mb-2">Bản sao trên máy chủ nằm trong <code>instance/backups/</code> và không được đưa lên Git.</li>
+                <li class="mb-2">Mỗi lần tạo sẽ giữ lại một file mới; hãy chuyển bản cần giữ sang thiết bị khác và quản lý dung lượng thư mục này.</li>
+                <li>Khôi phục từ giao diện chưa được hỗ trợ; cần dừng ứng dụng và khôi phục thủ công theo tài liệu.</li>
+            </ul>
+        </section>
+    </div>
+</div>
+{% endblock %}

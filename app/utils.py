@@ -1,13 +1,15 @@
 from datetime import date, timedelta
 from decimal import Decimal, InvalidOperation
 from functools import wraps
+import json
 from flask import abort, flash
 from flask_login import current_user, login_required
 from .extensions import db
-from .models import Budget, Category, Expense, User
+from .models import AuditLog, Budget, Category, Expense, User
 
 
-VALID_SOURCES = {"personal", "common"}
+VALID_SOURCES = {"personal", "common", "unit"}
+SOURCE_LABELS = {"personal": "Cá nhân", "common": "Quỹ chung", "unit": "Ngân sách đơn vị"}
 VALID_TYPES = {"expense", "income"}
 VALID_PERIODS = {"weekly", "monthly", "quarterly"}
 
@@ -47,7 +49,7 @@ def visible_expense_query(user=None):
     user = user or current_user
     query = Expense.query.join(Category, Expense.idCategory == Category.idCategory)
     if not user.is_admin:
-        query = query.filter(db.or_(Expense.idUser == user.idUser, Expense.source == "common"))
+        query = query.filter(db.or_(Expense.idUser == user.idUser, Expense.source.in_(("common", "unit"))))
     return query
 
 
@@ -112,7 +114,7 @@ def budget_progress(budget):
     spent = budget_spent(budget)
     limit = Decimal(str(budget.amountLimit))
     percent = float((spent / limit) * 100) if limit > 0 else 0
-    return spent, min(percent, 100), percent >= 100
+    return spent, min(percent, 100), percent > 100
 
 
 def visible_budgets(user=None):
@@ -120,7 +122,7 @@ def visible_budgets(user=None):
     if user.is_admin:
         return Budget.query.order_by(Budget.year.desc(), Budget.idBudget.desc()).all()
     return Budget.query.filter(
-        db.or_(Budget.idUser == user.idUser, db.and_(Budget.source == "common", Budget.idUser.is_(None)))
+        db.or_(Budget.idUser == user.idUser, db.and_(Budget.source.in_(("common", "unit")), Budget.idUser.is_(None)))
     ).order_by(Budget.year.desc(), Budget.idBudget.desc()).all()
 
 
@@ -143,8 +145,13 @@ def notify_budget_overruns(expense):
     warnings = []
     for budget in applicable_budgets_for_expense(expense):
         spent, _, exceeded = budget_progress(budget)
+        limit = Decimal(str(budget.amountLimit))
+        percent = float((spent / limit) * 100) if limit > 0 else 0
+        scope = SOURCE_LABELS.get(budget.source, "ngân sách")
         if exceeded:
-            warnings.append(f"Đã vượt hạn mức {budget_period_label(budget)} ({budget.source == 'common' and 'quỹ chung tập thể' or 'thành viên'}): {spent:,.0f} / {Decimal(str(budget.amountLimit)):,.0f} VNĐ.")
+            warnings.append(f"Đã vượt hạn mức {budget_period_label(budget)} ({scope}): {spent:,.0f} / {limit:,.0f} VNĐ.")
+        elif percent >= 80:
+            warnings.append(f"Đã sử dụng {percent:.0f}% hạn mức {budget_period_label(budget)} ({scope}): {spent:,.0f} / {limit:,.0f} VNĐ.")
     for warning in warnings:
         flash(warning, "warning")
 
@@ -180,3 +187,34 @@ def create_audit_free_user(username, full_name, password, role):
     user = User(username=username, hoten=full_name, role=role)
     user.set_password(password)
     return user
+
+
+def source_label(source):
+    return SOURCE_LABELS.get(source, "Không xác định")
+
+
+def add_audit_log(action, entity_type, entity_id=None, details=None):
+    """Add an audit entry to the current transaction without committing it."""
+    actor = current_user if getattr(current_user, "is_authenticated", False) else None
+    db.session.add(AuditLog(
+        actor_id=actor.idUser if actor else None,
+        actor_name=actor.username if actor else "system",
+        action=action,
+        entity_type=entity_type,
+        entity_id=entity_id,
+        details=json.dumps(details or {}, ensure_ascii=False, default=str),
+    ))
+
+
+def find_duplicate_expense(user_id, transaction_date, amount, category_id, source, exclude_id=None):
+    query = Expense.query.filter_by(
+        date=transaction_date,
+        amount=amount,
+        idCategory=category_id,
+        source=source,
+    )
+    if source == "personal":
+        query = query.filter(Expense.idUser == user_id)
+    if exclude_id is not None:
+        query = query.filter(Expense.idExpense != exclude_id)
+    return query.order_by(Expense.idExpense.asc()).first()

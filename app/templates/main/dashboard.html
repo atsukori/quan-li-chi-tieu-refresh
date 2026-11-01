@@ -17,7 +17,7 @@
         {% if budget_cards %}
             <div class="budget-mini-list">
             {% for row in budget_cards %}
-                <div class="budget-mini-item"><div class="d-flex justify-content-between gap-2 mb-2"><div><div class="budget-name">{{ 'Quỹ chung' if row.budget.source == 'common' else (row.budget.user.hoten if row.budget.user else 'Cá nhân') }}</div><div class="text-secondary small">{{ budget_period_label(row.budget) }}</div></div><span class="small fw-semibold {{ 'text-danger' if row.exceeded else 'text-secondary' }}">{{ 'Vượt mức' if row.exceeded else (row.percent|round|int|string ~ '%') }}</span></div><div class="progress budget-progress"><div class="progress-bar {{ 'bg-danger' if row.exceeded else 'bg-primary' }}" style="width: {{ row.percent }}%"></div></div><div class="d-flex justify-content-between mt-2 small"><span>{{ row.spent|vnd }}</span><span class="text-secondary">/ {{ row.budget.amountLimit|vnd }}</span></div></div>
+                <div class="budget-mini-item"><div class="d-flex justify-content-between gap-2 mb-2"><div><div class="budget-name">{{ source_label(row.budget.source) if row.budget.source != 'personal' else (row.budget.user.hoten if row.budget.user else 'Cá nhân') }}</div><div class="text-secondary small">{{ budget_period_label(row.budget) }}</div></div><span class="small fw-semibold {{ 'text-danger' if row.exceeded else ('text-warning' if row.percent >= 80 else 'text-secondary') }}">{{ 'Vượt mức' if row.exceeded else (row.percent|round|int|string ~ '%') }}</span></div><div class="progress budget-progress"><div class="progress-bar {{ 'bg-danger' if row.exceeded else ('bg-warning' if row.percent >= 80 else 'bg-primary') }}" style="width: {{ row.percent }}%"></div></div><div class="d-flex justify-content-between mt-2 small"><span>{{ row.spent|vnd }}</span><span class="text-secondary">/ {{ row.budget.amountLimit|vnd }}</span></div></div>
             {% endfor %}
             </div>
         {% else %}<div class="empty-state py-4"><div class="empty-icon"><i class="bi bi-speedometer2"></i></div><p class="mb-1 fw-semibold">Chưa có hạn mức hiệu lực</p><p class="small text-secondary mb-0">Quản trị viên có thể thiết lập hạn mức cho từng thành viên hoặc quỹ chung của tập thể.</p></div>{% endif %}
@@ -26,13 +26,13 @@
 <section class="content-card"><div class="section-heading"><div><h2 class="section-title">Giao dịch gần đây</h2><p class="section-subtitle">Những giao dịch được cập nhật gần nhất</p></div><a class="section-link" href="{{ url_for('transactions.index') }}">Tất cả giao dịch <i class="bi bi-arrow-right ms-1"></i></a></div>
     {% if recent_items %}
     <div class="table-responsive"><table class="table app-table align-middle mb-0"><thead><tr><th>Ngày</th><th>Giao dịch</th><th>Thành viên</th><th>Nguồn tiền</th><th class="text-end">Số tiền</th></tr></thead><tbody>
-    {% for item in recent_items %}<tr><td class="text-nowrap">{{ item.date|date_vn }}</td><td><div class="fw-semibold">{{ item.category.nameCategory }}</div><div class="text-secondary small">{{ item.purpose or 'Không có ghi chú' }}</div></td><td>{{ item.user.hoten }}</td><td><span class="badge rounded-pill {{ 'badge-common' if item.source == 'common' else 'badge-personal' }}">{{ 'Quỹ chung' if item.source == 'common' else 'Cá nhân' }}</span></td><td class="text-end fw-semibold text-nowrap {{ 'amount-income' if item.category.type == 'income' else 'amount-expense' }}">{{ '+' if item.category.type == 'income' else '−' }}{{ item.amount|vnd }}</td></tr>{% endfor %}
+    {% for item in recent_items %}<tr><td class="text-nowrap">{{ item.date|date_vn }}</td><td><div class="fw-semibold">{{ item.category.nameCategory }}</div><div class="text-secondary small">{{ item.purpose or 'Không có ghi chú' }}</div></td><td>{{ item.user.hoten }}</td><td><span class="badge rounded-pill {{ 'badge-common' if item.source != 'personal' else 'badge-personal' }}">{{ source_label(item.source) }}</span></td><td class="text-end fw-semibold text-nowrap {{ 'amount-income' if item.category.type == 'income' else 'amount-expense' }}">{{ '+' if item.category.type == 'income' else '−' }}{{ item.amount|vnd }}</td></tr>{% endfor %}
     </tbody></table></div>
     {% else %}<div class="empty-state"><div class="empty-icon"><i class="bi bi-receipt"></i></div><p class="fw-semibold mb-1">Chưa có giao dịch</p><p class="text-secondary small">Bắt đầu bằng cách thêm khoản thu hoặc chi đầu tiên.</p><a class="btn btn-sm btn-primary" href="{{ url_for('transactions.create') }}">Thêm giao dịch</a></div>{% endif %}
 </section>
 {% endblock %}
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='vendor/chartjs/chart.umd.min.js') }}"></script>
 <script>
 const chartCanvas = document.getElementById('expenseChart');
 if (chartCanvas) {

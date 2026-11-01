@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Hệ thống quản lý thu chi cho tập thể và tổ chức bằng Flask và SQLite">
     <title>{% block title %}Quản lý chi tiêu tập thể{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     {% block head %}{% endblock %}
 </head>
@@ -31,6 +31,10 @@
                     <ul class="dropdown-menu dropdown-menu-dark">
                         <li><a class="dropdown-item" href="{{ url_for('admin.users') }}">Tài khoản thành viên</a></li>
                         <li><a class="dropdown-item" href="{{ url_for('admin.categories') }}">Danh mục thu/chi</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('admin.import_transactions') }}">Nhập giao dịch từ Excel</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('admin.audit_log') }}">Nhật ký hoạt động</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('admin.database_backup') }}"><i class="bi bi-database-down me-2"></i>Sao lưu database</a></li>
                     </ul>
                 </li>
                 {% endif %}
@@ -71,7 +75,7 @@
         <span>Flask · SQLite · Bootstrap 5</span>
     </div>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -22,6 +22,7 @@ instance/*.db
 instance/*.sqlite
 instance/*.sqlite3
 instance/backups/
+instance/imports/
 *.db
 *.sqlite
 *.sqlite3
