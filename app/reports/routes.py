@@ -7,14 +7,15 @@ from flask_login import current_user, login_required
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
+from ..extensions import db
 from ..models import Category, Expense, User
-from ..utils import parse_iso_date, period_range, total_amount, visible_expense_query
+from ..utils import VALID_SOURCES, parse_iso_date, period_range, source_label, visible_expense_query
 
 
 reports_bp = Blueprint("reports", __name__)
 
 
-def _report_data():
+def _report_data(include_all_items=False):
     mode = request.args.get("mode", "month")
     if mode not in {"day", "week", "month", "year", "custom"}:
         mode = "month"
@@ -32,29 +33,38 @@ def _report_data():
     if current_user.is_admin and member_value.isdigit():
         query = query.filter(Expense.idUser == int(member_value))
     source = request.args.get("source", "")
-    if source in {"personal", "common"}:
+    if source in VALID_SOURCES:
         query = query.filter(Expense.source == source)
-    items = query.order_by(Expense.date.asc(), Expense.idExpense.asc()).all()
-    income_total = total_amount(items, "income")
-    expense_total = total_amount(items, "expense")
+    ordered_query = query.order_by(Expense.date.asc(), Expense.idExpense.asc())
+    total_count = ordered_query.count()
+    pagination = None if include_all_items else ordered_query.paginate(page=max(request.args.get("page", 1, type=int), 1), per_page=25, error_out=False)
+    items = ordered_query.all() if include_all_items else pagination.items
 
-    category_totals = {}
-    daily_totals = {}
-    for item in items:
-        key = (item.category.nameCategory, item.category.type)
-        category_totals[key] = category_totals.get(key, Decimal("0")) + Decimal(str(item.amount))
-        if item.category.type == "expense":
-            daily_key = item.date.isoformat()
-            daily_totals[daily_key] = daily_totals.get(daily_key, Decimal("0")) + Decimal(str(item.amount))
-    category_rows = [{"name": name, "type": category_type, "amount": amount} for (name, category_type), amount in sorted(category_totals.items(), key=lambda pair: pair[1], reverse=True)]
-    chart_labels = sorted(daily_totals.keys())
-    chart_values = [float(daily_totals[label]) for label in chart_labels]
+    totals_by_type = {
+        category_type: Decimal(str(amount or 0))
+        for category_type, amount in query.with_entities(Category.type, db.func.sum(Expense.amount)).group_by(Category.type).all()
+    }
+    income_total = totals_by_type.get("income", Decimal("0"))
+    expense_total = totals_by_type.get("expense", Decimal("0"))
+    category_rows = [
+        {"name": name, "type": category_type, "amount": Decimal(str(amount or 0))}
+        for name, category_type, amount in query.with_entities(
+            Category.nameCategory, Category.type, db.func.sum(Expense.amount)
+        ).group_by(Category.nameCategory, Category.type).order_by(db.func.sum(Expense.amount).desc()).all()
+    ]
+    daily_rows = query.filter(Category.type == "expense").with_entities(
+        Expense.date, db.func.sum(Expense.amount)
+    ).group_by(Expense.date).order_by(Expense.date.asc()).all()
+    chart_labels = [day.isoformat() for day, _amount in daily_rows]
+    chart_values = [float(amount or 0) for _day, amount in daily_rows]
     members = User.query.order_by(User.hoten.asc()).all() if current_user.is_admin else []
     return {
         "mode": mode,
         "start": start,
         "end": end,
         "items": items,
+        "pagination": pagination,
+        "total_count": total_count,
         "income_total": income_total,
         "expense_total": expense_total,
         "balance": income_total - expense_total,
@@ -76,7 +86,7 @@ def index():
 @reports_bp.route("/export.xlsx")
 @login_required
 def export_xlsx():
-    report = _report_data()
+    report = _report_data(include_all_items=True)
     workbook = Workbook()
     summary = workbook.active
     summary.title = "Tong quan"
@@ -108,7 +118,7 @@ def export_xlsx():
             item.user.hoten,
             "Thu nhập" if item.category.type == "income" else "Chi tiêu",
             item.category.nameCategory,
-            "Quỹ chung" if item.source == "common" else "Cá nhân",
+            source_label(item.source),
             float(item.amount),
             item.purpose,
         ])
@@ -128,7 +138,7 @@ def export_xlsx():
 @reports_bp.route("/export.csv")
 @login_required
 def export_csv():
-    report = _report_data()
+    report = _report_data(include_all_items=True)
     output = StringIO(newline="")
     writer = csv.writer(output)
     writer.writerow(["Mã giao dịch", "Ngày", "Thành viên", "Loại", "Danh mục", "Nguồn tiền", "Số tiền (VNĐ)", "Ghi chú"])
@@ -139,7 +149,7 @@ def export_csv():
             item.user.hoten,
             "Thu nhập" if item.category.type == "income" else "Chi tiêu",
             item.category.nameCategory,
-            "Quỹ chung" if item.source == "common" else "Cá nhân",
+            source_label(item.source),
             str(item.amount),
             item.purpose,
         ])

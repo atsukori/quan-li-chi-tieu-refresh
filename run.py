@@ -23,4 +23,9 @@ if __name__ == "__main__":
                 "python -m pip install -r requirements.txt"
             ) from error
 
+        print(f"Starting Waitress on {host}:{port}. Press Ctrl+C to stop.", flush=True)
+        if host == "0.0.0.0":
+            print(f"Open http://<device-IP>:{port} from another device on the LAN.", flush=True)
+        else:
+            print(f"Open http://{host}:{port} in your browser.", flush=True)
         serve(app, host=host, port=port, threads=2)

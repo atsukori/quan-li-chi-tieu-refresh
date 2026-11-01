@@ -4,7 +4,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required
 from ..extensions import db
 from ..models import Budget, User
-from ..utils import VALID_PERIODS, admin_required, budget_progress, get_budget_period, visible_budgets
+from ..utils import VALID_PERIODS, VALID_SOURCES, add_audit_log, admin_required, budget_progress, get_budget_period, visible_budgets
 
 
 budgets_bp = Blueprint("budgets", __name__)
@@ -50,6 +50,7 @@ def edit(budget_id):
 @admin_required
 def delete(budget_id):
     budget = Budget.query.get_or_404(budget_id)
+    add_audit_log("delete", "budget", budget.idBudget, {"source": budget.source, "user_id": budget.idUser, "amount_limit": str(budget.amountLimit), "year": budget.year, "period_type": budget.period_type, "period_number": budget.period_number})
     db.session.delete(budget)
     db.session.commit()
     flash("Đã xóa hạn mức.", "success")
@@ -87,7 +88,7 @@ def _save_budget(budget):
     valid_number = (period_type == "monthly" and 1 <= period_number <= 12) or (period_type == "quarterly" and 1 <= period_number <= 4) or (period_type == "weekly" and 1 <= period_number <= 53)
     if period_type not in VALID_PERIODS or not valid_number:
         errors.append("Kỳ áp dụng không hợp lệ với loại tuần/tháng/quý đã chọn.")
-    if source not in {"personal", "common"}:
+    if source not in VALID_SOURCES:
         errors.append("Nguồn ngân sách không hợp lệ.")
     user = None
     if source == "personal":
@@ -120,6 +121,11 @@ def _save_budget(budget):
     if budget is None:
         budget = Budget()
         db.session.add(budget)
+    action = "update" if budget.idBudget else "create"
+    before = None if action == "create" else {
+        "source": budget.source, "user_id": budget.idUser, "amount_limit": str(budget.amountLimit),
+        "year": budget.year, "period_type": budget.period_type, "period_number": budget.period_number,
+    }
     budget.idUser = user.idUser if user else None
     budget.amountLimit = amount_limit
     budget.month = month
@@ -127,5 +133,10 @@ def _save_budget(budget):
     budget.source = source
     budget.period_type = period_type
     budget.period_number = period_number
+    db.session.flush()
+    add_audit_log(action, "budget", budget.idBudget, {
+        "before": before,
+        "after": {"source": source, "user_id": budget.idUser, "amount_limit": str(amount_limit), "year": year, "period_type": period_type, "period_number": period_number},
+    })
     db.session.commit()
     return budget
