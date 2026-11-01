@@ -1,0 +1,81 @@
+﻿CẤU TRÚC THƯ MỤC DỰ ÁN
+Đường dẫn gốc: D:\Project\quan-li-chi-tieu-refresh
+Ghi chú: Danh sách được đọc từ workspace local. Bỏ qua .git, venv, .venv, __pycache__ và node_modules nếu có.
+
+.
+|-- .env.example
+|-- .gitignore
+|-- README.md
+|-- requirements.txt
+|-- run.py
+|-- run_admin.bat
+|-- run_admin.sh
+|-- run_demo.bat
+|-- run_demo.sh
+|-- seed.py
+|-- init_admin.py
+|-- app/
+|   |-- __init__.py
+|   |-- config.py
+|   |-- extensions.py
+|   |-- models.py
+|   |-- utils.py
+|   |-- admin/
+|   |   |-- __init__.py
+|   |   `-- routes.py
+|   |-- auth/
+|   |   |-- __init__.py
+|   |   `-- routes.py
+|   |-- budgets/
+|   |   |-- __init__.py
+|   |   `-- routes.py
+|   |-- main/
+|   |   |-- __init__.py
+|   |   `-- routes.py
+|   |-- reports/
+|   |   |-- __init__.py
+|   |   `-- routes.py
+|   |-- transactions/
+|   |   |-- __init__.py
+|   |   `-- routes.py
+|   |-- static/
+|   |   `-- css/
+|   |       `-- style.css
+|   `-- templates/
+|       |-- base.html
+|       |-- admin/
+|       |   |-- categories.html
+|       |   |-- user_form.html
+|       |   `-- users.html
+|       |-- auth/
+|       |   `-- login.html
+|       |-- budgets/
+|       |   |-- form.html
+|       |   `-- index.html
+|       |-- errors/
+|       |   |-- 403.html
+|       |   `-- 404.html
+|       |-- main/
+|       |   `-- dashboard.html
+|       |-- reports/
+|       |   `-- index.html
+|       `-- transactions/
+|           |-- form.html
+|           `-- index.html
+|-- data/
+|   `-- mau_cau_truc_du_lieu.xlsx
+|-- docs/
+|   |-- description.md
+|   |-- prompts.docx
+|   |-- prompts.txt
+|   |-- project-structure.txt
+|   |-- quan-li-chi-tieu-refresh.docx
+|   `-- quan-li-chi-tieu-refresh.txt
+|-- instance/
+|   |-- .gitkeep
+|   `-- family_expenses.db
+`-- tests/
+    `-- test_app.py
+
+
+
