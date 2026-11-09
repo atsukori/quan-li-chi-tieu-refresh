@@ -38,7 +38,7 @@ def create_sqlite_backup():
     try:
         backup_dir.mkdir(parents=True, exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-        backup_path = backup_dir / f"family_expenses-{timestamp}.sqlite3"
+        backup_path = backup_dir / f"expense-{timestamp}.sqlite3"
         source_uri = f"{database_path.as_uri()}?mode=ro"
 
         with closing(sqlite3.connect(source_uri, uri=True)) as source, closing(
