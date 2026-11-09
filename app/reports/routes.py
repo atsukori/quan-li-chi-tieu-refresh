@@ -15,6 +15,14 @@ from ..utils import VALID_SOURCES, parse_iso_date, period_range, source_label, v
 reports_bp = Blueprint("reports", __name__)
 
 
+def _csv_text(value):
+    """Prevent text fields from being interpreted as spreadsheet formulas."""
+    text = "" if value is None else str(value)
+    if text.lstrip(" \t\r\n").startswith(("=", "+", "-", "@")):
+        return "'" + text
+    return text
+
+
 def _report_data(include_all_items=False):
     mode = request.args.get("mode", "month")
     if mode not in {"day", "week", "month", "year", "custom"}:
@@ -122,6 +130,9 @@ def export_xlsx():
             float(item.amount),
             item.purpose,
         ])
+        for cell in sheet[sheet.max_row]:
+            if isinstance(cell.value, str):
+                cell.data_type = "s"
         sheet.cell(row=sheet.max_row, column=7).number_format = '#,##0.00'
     widths = [16, 14, 24, 15, 22, 16, 20, 42]
     for index, width in enumerate(widths, 1):
@@ -146,11 +157,11 @@ def export_csv():
         writer.writerow([
             item.idExpense,
             item.date.strftime("%d/%m/%Y"),
-            item.user.hoten,
+            _csv_text(item.user.hoten),
             "Thu nhập" if item.category.type == "income" else "Chi tiêu",
-            item.category.nameCategory,
+            _csv_text(item.category.nameCategory),
             source_label(item.source),
             str(item.amount),
-            item.purpose,
+            _csv_text(item.purpose),
         ])
     return Response("\ufeff" + output.getvalue(), mimetype="text/csv; charset=utf-8", headers={"Content-Disposition": f"attachment; filename=bao_cao_chi_tieu_{report['start'].isoformat()}_{report['end'].isoformat()}.csv"})

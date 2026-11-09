@@ -1,3 +1,5 @@
+from urllib.parse import urlsplit
+
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_user, logout_user
 from ..models import User
@@ -17,7 +19,15 @@ def login():
         if user and user.is_active_account and user.check_password(password):
             login_user(user, remember=request.form.get("remember") == "on")
             next_url = request.args.get("next", "")
-            if not next_url.startswith("/") or next_url.startswith("//"):
+            parsed_next = urlsplit(next_url)
+            if (
+                not next_url.startswith("/")
+                or next_url.startswith("//")
+                or "\\" in next_url
+                or parsed_next.scheme
+                or parsed_next.netloc
+                or any(ord(character) < 32 for character in next_url)
+            ):
                 next_url = url_for("main.dashboard")
             return redirect(next_url)
         if user and not user.is_active_account:
