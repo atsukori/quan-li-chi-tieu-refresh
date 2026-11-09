@@ -1,10 +1,18 @@
 from datetime import date
-from decimal import Decimal
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required
 from ..extensions import db
 from ..models import Budget, User
-from ..utils import VALID_PERIODS, VALID_SOURCES, add_audit_log, admin_required, budget_progress, get_budget_period, visible_budgets
+from ..utils import (
+    VALID_PERIODS,
+    VALID_SOURCES,
+    add_audit_log,
+    admin_required,
+    budget_progress,
+    get_budget_period,
+    parse_amount,
+    visible_budgets,
+)
 
 
 budgets_bp = Blueprint("budgets", __name__)
@@ -58,21 +66,16 @@ def delete(budget_id):
 
 
 def _save_budget(budget):
-    raw_amount = request.form.get("amountLimit", "").strip().replace(",", "")
+    raw_amount = request.form.get("amountLimit", "").strip()
     source = request.form.get("source", "personal")
     period_type = request.form.get("period_type", "monthly")
     year_raw = request.form.get("year", "")
     period_raw = request.form.get("period_number", "")
     user_raw = request.form.get("idUser", "")
     errors = []
-    try:
-        amount_limit = Decimal(raw_amount)
-        if not amount_limit.is_finite() or amount_limit <= 0:
-            raise ValueError
-        amount_limit = amount_limit.quantize(Decimal("0.01"))
-    except Exception:
-        amount_limit = None
-        errors.append("Hạn mức phải là số tiền lớn hơn 0.")
+    amount_limit = parse_amount(raw_amount)
+    if amount_limit is None:
+        errors.append("Hạn mức phải lớn hơn 0 và không vượt quá 999.999.999.999,99 VNĐ.")
     try:
         year = int(year_raw)
         if year < 2000 or year > 2100:
