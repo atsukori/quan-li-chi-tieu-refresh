@@ -1,26 +1,27 @@
 ﻿CẤU TRÚC THƯ MỤC DỰ ÁN
 Đường dẫn gốc: D:\Project\quan-li-chi-tieu-refresh
-Ghi chú: Danh sách được đọc từ workspace local. Bỏ qua .git, venv, .venv, __pycache__ và node_modules nếu có.
+Ghi chú: Cây dưới đây liệt kê các tệp và thư mục dự án hiện có trong workspace; bỏ qua .git, môi trường ảo, cache và các tệp database / sao lưu cục bộ bị Git bỏ qua.
 
 .
 |-- .env.example
 |-- .gitignore
+|-- AGENTS.md
 |-- README.md
+|-- backup_db.py
+|-- init_admin.py
 |-- requirements.txt
 |-- run.py
-|-- backup_db.py
 |-- run_admin.bat
 |-- run_admin.sh
 |-- run_demo.bat
 |-- run_demo.sh
 |-- seed.py
-|-- init_admin.py
 |-- app/
 |   |-- __init__.py
-|   |-- config.py
 |   |-- backups.py
-|   |-- importer.py
+|   |-- config.py
 |   |-- extensions.py
+|   |-- importer.py
 |   |-- models.py                 # Role, User, Category, Expense, Budget, AuditLog
 |   |-- utils.py
 |   |-- admin/
@@ -44,16 +45,29 @@ Ghi chú: Danh sách được đọc từ workspace local. Bỏ qua .git, venv, 
 |   |-- static/
 |   |   |-- css/
 |   |   |   `-- style.css
-|   |   `-- vendor/               # Bootstrap, Bootstrap Icons, Chart.js (offline)
+|   |   `-- vendor/
+|   |       |-- bootstrap/
+|   |       |   |-- LICENSE
+|   |       |   |-- bootstrap.bundle.min.js
+|   |       |   `-- bootstrap.min.css
+|   |       |-- bootstrap-icons/
+|   |       |   |-- LICENSE
+|   |       |   |-- bootstrap-icons.min.css
+|   |       |   `-- fonts/
+|   |       |       |-- bootstrap-icons.woff
+|   |       |       `-- bootstrap-icons.woff2
+|   |       `-- chartjs/
+|   |           |-- LICENSE.md
+|   |           `-- chart.umd.min.js
 |   `-- templates/
 |       |-- base.html
 |       |-- admin/
 |       |   |-- audit_log.html
+|       |   |-- backup.html
 |       |   |-- categories.html
 |       |   |-- category_form.html
-|       |   |-- backup.html
-|       |   |-- import_transactions.html
 |       |   |-- import_preview.html
+|       |   |-- import_transactions.html
 |       |   |-- user_form.html
 |       |   `-- users.html
 |       |-- auth/
@@ -82,12 +96,6 @@ Ghi chú: Danh sách được đọc từ workspace local. Bỏ qua .git, venv, 
 |   |-- quan-li-chi-tieu-refresh.docx
 |   `-- quan-li-chi-tieu-refresh.txt
 |-- instance/
-|   |-- .gitkeep
-|   |-- family_expenses.db (database local, bị Git bỏ qua)
-|   |-- backups/ (bản sao database, bị Git bỏ qua)
-|   `-- imports/ (dữ liệu xem trước tạm, bị Git bỏ qua)
+|   `-- .gitkeep
 `-- tests/
     `-- test_app.py
-
-
-
