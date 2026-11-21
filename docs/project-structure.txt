@@ -1,0 +1,101 @@
+﻿CẤU TRÚC THƯ MỤC DỰ ÁN
+Đường dẫn gốc: D:\Project\quan-li-chi-tieu-refresh
+Ghi chú: Cây dưới đây liệt kê các tệp và thư mục dự án hiện có trong workspace; bỏ qua .git, môi trường ảo, cache và các tệp database / sao lưu cục bộ bị Git bỏ qua.
+
+.
+|-- .env.example
+|-- .gitignore
+|-- AGENTS.md
+|-- README.md
+|-- backup_db.py
+|-- init_admin.py
+|-- requirements.txt
+|-- run.py
+|-- run_admin.bat
+|-- run_admin.sh
+|-- run_demo.bat
+|-- run_demo.sh
+|-- seed.py
+|-- app/
+|   |-- __init__.py
+|   |-- backups.py
+|   |-- config.py
+|   |-- extensions.py
+|   |-- importer.py
+|   |-- models.py                 # Role, User, Category, Expense, Budget, AuditLog
+|   |-- utils.py
+|   |-- admin/
+|   |   |-- __init__.py
+|   |   `-- routes.py
+|   |-- auth/
+|   |   |-- __init__.py
+|   |   `-- routes.py
+|   |-- budgets/
+|   |   |-- __init__.py
+|   |   `-- routes.py
+|   |-- main/
+|   |   |-- __init__.py
+|   |   `-- routes.py
+|   |-- reports/
+|   |   |-- __init__.py
+|   |   `-- routes.py
+|   |-- transactions/
+|   |   |-- __init__.py
+|   |   `-- routes.py
+|   |-- static/
+|   |   |-- css/
+|   |   |   `-- style.css
+|   |   `-- vendor/
+|   |       |-- bootstrap/
+|   |       |   |-- LICENSE
+|   |       |   |-- bootstrap.bundle.min.js
+|   |       |   `-- bootstrap.min.css
+|   |       |-- bootstrap-icons/
+|   |       |   |-- LICENSE
+|   |       |   |-- bootstrap-icons.min.css
+|   |       |   `-- fonts/
+|   |       |       |-- bootstrap-icons.woff
+|   |       |       `-- bootstrap-icons.woff2
+|   |       `-- chartjs/
+|   |           |-- LICENSE.md
+|   |           `-- chart.umd.min.js
+|   `-- templates/
+|       |-- base.html
+|       |-- admin/
+|       |   |-- audit_log.html
+|       |   |-- backup.html
+|       |   |-- categories.html
+|       |   |-- category_form.html
+|       |   |-- import_preview.html
+|       |   |-- import_transactions.html
+|       |   |-- user_form.html
+|       |   `-- users.html
+|       |-- auth/
+|       |   `-- login.html
+|       |-- budgets/
+|       |   |-- form.html
+|       |   `-- index.html
+|       |-- errors/
+|       |   |-- 403.html
+|       |   `-- 404.html
+|       |-- main/
+|       |   `-- dashboard.html
+|       |-- reports/
+|       |   `-- index.html
+|       `-- transactions/
+|           |-- form.html
+|           `-- index.html
+|-- data/
+|   `-- mau_cau_truc_du_lieu.xlsx
+|-- docs/
+|   |-- description.md
+|   |-- prompts.docx
+|   |-- prompts.txt
+|   |-- project-structure.txt
+|   |-- python311-trixie.md
+|   |-- quan-li-chi-tieu-refresh.docx
+|   `-- quan-li-chi-tieu-refresh.txt
+|-- instance/
+|   `-- .gitkeep
+`-- tests/
+    `-- test_app.py

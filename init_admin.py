@@ -11,10 +11,16 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Khởi tạo CSDL sạch với duy nhất một tài khoản quản trị viên."
     )
-    parser.add_argument(
+    initialization_mode = parser.add_mutually_exclusive_group()
+    initialization_mode.add_argument(
         "--reset",
         action="store_true",
         help="XÓA toàn bộ dữ liệu hiện có rồi tạo lại CSDL chỉ có tài khoản admin.",
+    )
+    initialization_mode.add_argument(
+        "--skip-existing",
+        action="store_true",
+        help="Giữ nguyên và bỏ qua khởi tạo nếu CSDL đã có dữ liệu.",
     )
     parser.add_argument(
         "--username",
@@ -63,6 +69,9 @@ def main():
         if not args.reset and any(
             (existing_users, existing_categories, existing_expenses, existing_budgets)
         ):
+            if args.skip_existing:
+                print("CSDL đã có dữ liệu; giữ nguyên và bỏ qua khởi tạo admin-only.")
+                return
             admin = User.query.filter_by(username=username).first()
             is_already_initialized = (
                 existing_users == 1
@@ -88,7 +97,7 @@ def main():
         if admin_role is None:
             admin_role = Role(
                 roleName="admin",
-                description="Quản trị tài khoản, danh mục, hạn mức và báo cáo toàn gia đình.",
+                description="Quản trị tài khoản, danh mục, hạn mức và báo cáo tài chính của tập thể / tổ chức.",
             )
             db.session.add(admin_role)
 
@@ -96,7 +105,7 @@ def main():
         if member_role is None:
             member_role = Role(
                 roleName="user",
-                description="Ghi nhận và theo dõi giao dịch cá nhân, giao dịch quỹ chung.",
+                description="Ghi nhận giao dịch cá nhân và theo dõi quỹ chung của tập thể.",
             )
             db.session.add(member_role)
 

@@ -12,31 +12,37 @@ CATEGORIES = [
     ("Ăn uống", "expense"),
     ("Điện nước", "expense"),
     ("Đi lại", "expense"),
-    ("Học tập", "expense"),
-    ("Giải trí", "expense"),
-    ("Y tế", "expense"),
-    ("Mua sắm", "expense"),
-    ("Sinh hoạt gia đình", "expense"),
-    ("Lương / trợ cấp", "income"),
+    ("Học tập / đào tạo", "expense"),
+    ("Hoạt động tập thể", "expense"),
+    ("Công tác", "expense"),
+    ("Văn phòng phẩm", "expense"),
+    ("Mua sắm / thiết bị", "expense"),
+    ("Giải trí / sự kiện", "expense"),
+    ("Y tế / phúc lợi", "expense"),
+    ("Đóng góp thành viên", "income"),
+    ("Tài trợ / hỗ trợ", "income"),
     ("Thu nhập khác", "income"),
 ]
 
 PURPOSES = {
-    "Ăn uống": ["Đi chợ", "Ăn trưa", "Mua thực phẩm", "Đồ uống", "Bữa tối gia đình"],
-    "Điện nước": ["Tiền điện", "Tiền nước", "Cước Internet", "Nạp điện thoại"],
-    "Đi lại": ["Xăng xe", "Gửi xe", "Xe buýt", "Di chuyển"],
-    "Học tập": ["Sách tham khảo", "Đồ dùng học tập", "Học phí", "Tài liệu học"],
-    "Giải trí": ["Xem phim", "Trò chơi", "Đi chơi cuối tuần", "Đăng ký dịch vụ"],
-    "Y tế": ["Thuốc", "Khám sức khỏe", "Vật dụng y tế"],
-    "Mua sắm": ["Đồ dùng cá nhân", "Quần áo", "Đồ gia dụng"],
-    "Sinh hoạt gia đình": ["Mua vật dụng gia đình", "Sửa chữa nhỏ", "Đóng góp quỹ chung"],
-    "Lương / trợ cấp": ["Lương tháng", "Trợ cấp", "Tiền được cấp"],
-    "Thu nhập khác": ["Bán đồ cũ", "Tiền thưởng", "Thu nhập làm thêm"],
+    "Ăn uống": ["Nước uống cho buổi sinh hoạt", "Suất ăn sự kiện", "Mua thực phẩm cho hoạt động"],
+    "Điện nước": ["Tiền điện", "Tiền nước", "Cước Internet", "Chi phí liên lạc"],
+    "Đi lại": ["Xăng xe công tác", "Gửi xe", "Vé xe buýt", "Chi phí di chuyển"],
+    "Học tập / đào tạo": ["Sách tham khảo", "Tài liệu tập huấn", "Chi phí đào tạo", "Tài liệu học tập"],
+    "Hoạt động tập thể": ["Vật tư cho hoạt động chung", "Chi phí sinh hoạt tập thể", "Đồ dùng tổ chức sự kiện"],
+    "Công tác": ["Lưu trú công tác", "Chi phí đi lại công tác", "Công tác phí"],
+    "Văn phòng phẩm": ["Giấy in", "Bút viết", "Mực in", "Vật tư văn phòng"],
+    "Mua sắm / thiết bị": ["Thiết bị văn phòng", "Phụ kiện máy tính", "Vật dụng dùng chung"],
+    "Giải trí / sự kiện": ["Tổ chức sự kiện", "Hoạt động giao lưu", "Vé tham dự chương trình"],
+    "Y tế / phúc lợi": ["Vật tư y tế", "Hỗ trợ chăm sóc sức khỏe", "Khám sức khỏe"],
+    "Đóng góp thành viên": ["Đóng góp quỹ chung", "Phí đóng góp định kỳ", "Ủng hộ hoạt động tập thể"],
+    "Tài trợ / hỗ trợ": ["Tài trợ hoạt động", "Kinh phí hỗ trợ", "Khoản tài trợ"],
+    "Thu nhập khác": ["Thu từ hoạt động", "Thu hồi kinh phí", "Khoản thu khác"],
 }
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Tạo dữ liệu mẫu cho Hệ thống Quản lý Chi tiêu Gia đình.")
+    parser = argparse.ArgumentParser(description="Tạo dữ liệu mẫu cho Hệ thống Quản lý Chi tiêu Tập thể / Tổ chức.")
     parser.add_argument("--reset", action="store_true", help="Xóa dữ liệu hiện tại và tạo lại toàn bộ dữ liệu mẫu.")
     parser.add_argument("--transactions", type=int, default=360, help="Số giao dịch mẫu cần tạo (mặc định: 360).")
     args = parser.parse_args()
@@ -56,10 +62,10 @@ def main():
         admin_role = Role.query.filter_by(roleName="admin").first()
         member_role = Role.query.filter_by(roleName="user").first()
         if not admin_role:
-            admin_role = Role(roleName="admin", description="Quản trị tài khoản, danh mục, hạn mức và báo cáo toàn gia đình.")
+            admin_role = Role(roleName="admin", description="Quản trị tài khoản, danh mục, hạn mức và báo cáo tài chính của tập thể / tổ chức.")
             db.session.add(admin_role)
         if not member_role:
-            member_role = Role(roleName="user", description="Ghi nhận và theo dõi giao dịch cá nhân, giao dịch quỹ chung.")
+            member_role = Role(roleName="user", description="Ghi nhận giao dịch cá nhân và theo dõi quỹ chung của tập thể.")
             db.session.add(member_role)
         db.session.flush()
 
@@ -100,7 +106,7 @@ def main():
                 category_name = category.nameCategory
                 if category_name == "Điện nước":
                     amount = random.randint(80000, 850000)
-                elif category_name in {"Học tập", "Y tế", "Mua sắm"}:
+                elif category_name in {"Học tập / đào tạo", "Y tế / phúc lợi", "Mua sắm / thiết bị", "Văn phòng phẩm", "Công tác"}:
                     amount = random.randint(50000, 1600000)
                 else:
                     amount = random.randint(15000, 650000)

@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 from .extensions import db
@@ -109,3 +110,77 @@ class Budget(db.Model):
 
     def __repr__(self):
         return f"<Budget {self.idBudget}: {self.amountLimit}>"
+
+
+class AuditLog(db.Model):
+    __tablename__ = "AuditLog"
+
+    idAuditLog = db.Column(db.Integer, primary_key=True)
+    actor_id = db.Column(db.Integer, db.ForeignKey("User.idUser", ondelete="SET NULL"), nullable=True, index=True)
+    actor_name = db.Column(db.String(80), nullable=False)
+    action = db.Column(db.String(40), nullable=False, index=True)
+    entity_type = db.Column(db.String(40), nullable=False, index=True)
+    entity_id = db.Column(db.Integer, nullable=True)
+    details = db.Column(db.Text, nullable=False, default="{}")
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+
+    @property
+    def details_data(self):
+        try:
+            value = json.loads(self.details or "{}")
+            return value if isinstance(value, dict) else {}
+        except (TypeError, ValueError):
+            return {}
+
+    @property
+    def details_pretty(self):
+        return json.dumps(self.details_data, ensure_ascii=False, indent=2, sort_keys=True)
+
+    @property
+    def summary(self):
+        details = self.details_data
+        values = details.get("after") or details.get("before") or details
+        actor = self.actor_name or "Người dùng"
+        verb = {
+            "create": "tạo",
+            "update": "chỉnh sửa",
+            "delete": "xóa",
+            "activate": "kích hoạt",
+            "deactivate": "ẩn",
+            "import": "nhập",
+            "backup": "tạo bản sao lưu",
+        }.get(self.action, self.action)
+
+        if self.entity_type == "category":
+            category_type = "thu nhập" if values.get("type") == "income" else "chi tiêu"
+            name = values.get("name") or "(không rõ tên)"
+            return f"{actor} đã {verb} danh mục {category_type}: {name}"
+        if self.entity_type == "expense":
+            category_name = values.get("category_name")
+            label = f"giao dịch #{self.entity_id or '?'}"
+            return f"{actor} đã {verb} {label}: {category_name}" if category_name else f"{actor} đã {verb} {label}"
+        if self.entity_type == "budget":
+            source_names = {"personal": "cá nhân", "common": "quỹ chung", "unit": "ngân sách đơn vị"}
+            source = source_names.get(values.get("source"), "ngân sách")
+            period_type = values.get("period_type")
+            period_names = {"weekly": "tuần", "monthly": "tháng", "quarterly": "quý"}
+            period = period_names.get(period_type, "")
+            if period and values.get("period_number") and values.get("year"):
+                period = f" {period} {values['period_number']}/{values['year']}"
+            amount = values.get("amount_limit")
+            amount_text = f", hạn mức {amount} VNĐ" if amount else ""
+            return f"{actor} đã {verb} hạn mức {source}{period}{amount_text}"
+        if self.entity_type == "user":
+            username = details.get("username") or values.get("username")
+            account = f"tài khoản {username}" if username else f"tài khoản thành viên #{self.entity_id or '?'}"
+            return f"{actor} đã {verb} {account}"
+        if self.entity_type == "expense_batch":
+            return (
+                f"{actor} đã nhập {details.get('imported', 0)} giao dịch từ Excel; "
+                f"bỏ qua {details.get('duplicates_skipped', 0)} dòng trùng và "
+                f"{details.get('invalid_skipped', 0)} dòng lỗi"
+            )
+        if self.entity_type == "database":
+            filename = details.get("filename")
+            return f"{actor} đã tạo bản sao lưu database" + (f": {filename}" if filename else "")
+        return f"{actor} đã thực hiện thao tác {self.action} trên {self.entity_type} #{self.entity_id or '?'}"

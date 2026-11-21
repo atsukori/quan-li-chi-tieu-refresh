@@ -1,7 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title Family Expense Manager - Demo Data
+title Group Expense Manager - Demo Data
 
 if not exist ".venv\Scripts\activate.bat" (
     echo ERROR: Cannot find the .venv virtual environment.
@@ -13,6 +13,7 @@ if not exist ".venv\Scripts\activate.bat" (
 )
 
 call ".venv\Scripts\activate.bat"
+set "FLASK_DEBUG=0"
 
 echo.
 echo WARNING: Demo mode will DELETE the current database data and recreate demo data.
@@ -32,7 +33,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo Starting Flask at http://127.0.0.1:5000
+echo Starting application at http://127.0.0.1:5000
 python run.py
 set "APP_EXIT_CODE=%ERRORLEVEL%"
 echo.

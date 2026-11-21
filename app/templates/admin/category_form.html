@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Sửa danh mục · Quản trị{% endblock %}
+{% block content %}
+<div class="page-heading mb-4"><p class="eyebrow">QUẢN TRỊ HỆ THỐNG</p><h1 class="page-title">Sửa danh mục</h1><p class="text-secondary mb-0">Cập nhật tên hoặc loại danh mục đang dùng.</p></div>
+<div class="row justify-content-center"><div class="col-12 col-xl-7"><section class="content-card form-card"><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if usage_count %}<div class="alert alert-warning">Danh mục đang được dùng trong {{ usage_count }} giao dịch. Nếu đổi loại từ thu nhập sang chi tiêu hoặc ngược lại, các giao dịch đó cũng sẽ được phân loại lại trong báo cáo và hạn mức.</div>{% endif %}
+    <div class="mb-3"><label for="nameCategory" class="form-label">Tên danh mục</label><input class="form-control" id="nameCategory" name="nameCategory" required maxlength="100" value="{{ request.form.get('nameCategory', category.nameCategory) }}"></div>
+    <div class="mb-3"><label for="type" class="form-label">Loại danh mục</label><select class="form-select" id="type" name="type" required><option value="expense" {{ 'selected' if request.form.get('type', category.type) == 'expense' }}>Chi tiêu</option><option value="income" {{ 'selected' if request.form.get('type', category.type) == 'income' }}>Thu nhập</option></select></div>
+    <div class="form-actions mt-4 pt-3"><a class="btn btn-light border" href="{{ url_for('admin.categories') }}">Hủy</a><button class="btn btn-primary" type="submit"><i class="bi bi-check2 me-1"></i>Lưu thay đổi</button></div>
+</form></section></div></div>
+{% endblock %}
