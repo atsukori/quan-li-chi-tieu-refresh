@@ -1,87 +1,186 @@
-1. Tên dự án: Hệ thống quản lí chi tiêu cho tập thể / tổ chức
-2. Mục đích:
-Giải quyết bài toán quản lí tài chính phân tán, thiếu minh bạch và khó kiểm soát dòng tiền trong một tập thể, tổ chức hoặc nhóm người dùng, giúp các thành viên kiểm soát thu chi, lập kế hoạch tài chính khoa học và nâng cao tính minh bạch, trách nhiệm chung.
-3. Mô tả bài toán:
-Các thành viên trong tập thể được cấp tài khoản cá nhân để đăng nhập, ghi nhận và quản lí các khoản thu/chi hàng ngày. Hệ thống cho phép phân định rõ nguồn tiền (tiền cá nhân, quỹ chung hoặc ngân sách đơn vị), theo dõi hạn mức chi tiêu định kí và tự động cảnh báo khi các khoản chi tiêu vượt mức cho phép. Người quản trị (Admin) có toàn quyền quản lí tài khoản, phân quyền, thiết lập hạn mức và theo dõi tổng quan tài chính của toàn bộ tập thể/tổ chức.
-4. Các chức năng có trong dự án:
-• Đăng nhập và phân quyền (thành viên / quản trị viên)
-• Quản lí tài khoản thành viên (tạo, khóa/mở khóa, cập nhật thông tin)
-• Quản lí danh mục thu/chi (thêm, sửa, ẩn; xóa danh mục chưa được giao dịch sử dụng)
-• Ghi nhận giao dịch thu/chi (thêm, sửa, xóa)
-• Thiết lập và cập nhật hạn mức chi tiêu (theo tuần, tháng, quý hoặc theo từng quỹ)
-• Thống kê và báo cáo tài chính (theo ngày, tuần, tháng, năm với bộ lọc linh hoạt theo nhóm / đơn vị)
-• Xuất dữ liệu báo cáo ra tệp Excel (*.xlsx) hoặc CSV
-Phạm vi triển khai hiện tại: phần mềm hỗ trợ `personal` (tiền cá nhân), `common` (quỹ chung) và `unit` (ngân sách đơn vị). Hạn mức hỗ trợ theo tuần, tháng và quý; các nguồn chung hiển thị cho mọi thành viên.
-5. Dữ liệu: Cơ sở dữ liệu
-Hệ thống sử dụng cơ sở dữ liệu gồm các bảng và liên kết chính:
-Bảng User (quản lí thông tin người dùng)
-| TT | Trường | Khóa | Giải thích |
-| --- | --- | --- | --- |
-| 1 | idUser | Khóa chính | Mã người dùng |
-| 2 | username | - | Tên đăng nhập |
-| 3 | password | - | Mật khẩu |
-| 4 | hoten | - | Họ và tên người dùng |
-| 5 | idRole | Khóa ngoại | Liên kết đến bảng Role |
-Bảng Role (quản lí phân quyền)
-| TT | Trường | Khóa | Giải thích |
-| --- | --- | --- | --- |
-| 1 | idRole | Khóa chính | Mã vai trò |
-| 2 | roleName | - | Tên vai trò (admin / user) |
-| 3 | description | - | Mô tả quyền |
-Bảng Category (danh mục chi tiêu)
-| TT | Trường | Khóa | Giải thích |
-| --- | --- | --- | --- |
-| 1 | idCategory | Khóa chính | Mã danh mục |
-| 2 | nameCategory | - | Tên danh mục |
-| 3 | type | - | Loại danh mục (chi tiêu / thu nhập) |
-Bảng Expense (quản lí giao dịch thu/chi)
-| TT | Trường | Khóa | Giải thích |
-| --- | --- | --- | --- |
-| 1 | idExpense | Khóa chính | Mã giao dịch |
-| 2 | idUser | Khóa ngoại | Liên kết đến bảng User |
-| 3 | idCategory | Khóa ngoại | Liên kết đến bảng Category |
-| 4 | date | - | Ngày thực hiện giao dịch (DD/MM/YYYY) |
-| 5 | amount | - | Số tiền giao dịch |
-| 6 | purpose | - | Mục đích / Ghi chú |
-| 7 | source | - | Nguồn tiền (cá nhân / quỹ chung / ngân sách đơn vị) |
-Bảng Budget (quản lí hạn mức chi tiêu)
-| TT | Trường | Khóa | Giải thích |
-| --- | --- | --- | --- |
-| 1 | idBudget | Khóa chính | Mã hạn mức |
-| 2 | idUser | Khóa ngoại | Liên kết đến bảng User |
-| 3 | amountLimit | - | Hạn mức tối đa cho phép |
-| 4 | month | - | Tháng áp dụng |
-| 5 | year | - | Năm áp dụng |
-6. Mô tả chi tiết các chức năng:
-• Đăng nhập và phân quyền: Người dùng đăng nhập bằng tài khoản được cấp. Hệ thống phân quyền rõ ràng: Quản trị viên (admin) quản lí toàn bộ hệ thống, tài khoản và hạn mức, thành viên (user) nhập liệu và theo dõi chi tiêu cá nhân/chung theo nhóm hoặc quỹ.
-• Quản lí tài khoản thành viên (admin): Cho phép admin tạo mới tài khoản cho các thành viên trong tập thể, cập nhật thông tin, khóa hoặc mở khóa tài khoản khi cần thiết.
-• Quản lí danh mục chi tiêu: Cung cấp danh mục các khoản thu/chi chuẩn hóa giúp người dùng dễ dàng phân loại giao dịch theo hoạt động, phòng ban hoặc nhóm chi phí.
-• Ghi nhận giao dịch: Thành viên nhập thông tin thu/chi hàng ngày (ngày, số tiền, mục đích, nguồn tiền, danh mục). Hệ thống kiểm tra dữ liệu và cảnh báo khi chi tiêu vượt hạn mức.
-• Thiết lập và cập nhật hạn mức: Admin thiết lập hạn mức chi tiêu định kì (tháng/quý) cho từng thành viên, từng nhóm hoặc quỹ chung.
-• Thống kê và báo cáo: Cung cấp cái nhìn tổng quan về tình hình tài chính qua các bộ lọc thời gian linh hoạt (ngày, tuần, tháng, năm) kèm biểu đồ trực quan.
-• Xuất dữ liệu Excel hoặc CSV: Hỗ trợ xuất toàn bộ hoặc một phần lịch sử chi tiêu ra file Excel (*.xlsx) hoặc CSV để lưu trữ hoặc phục vụ phân tích tài chính sâu hơn.
-7. Dữ liệu:
-• Dữ liệu thực tế thu thập được: Dự kiến thu thập khoảng 1000-2000 bản ghi dữ liệu giao dịch thu/chi giả định/thực tế từ nhiều thành viên trong tập thể trong thời gian 3-6 tháng (kèm file Excel mẫu cấu trúc dữ liệu).
-• Các trường hợp dữ liệu cụ thể cần giải quyết: - Trường hợp nhập số tiền âm hoặc bằng 0 => Hệ thống hiển thị thông báo lỗi và yêu cầu nhập lại. - Trường hợp chi tiêu vượt quá hạn mức tháng => Hệ thống phát cảnh báo trực quan trên giao diện. - Trường hợp trùng lặp giao dịch trong ngày => Hỗ trợ tính năng cảnh báo, chỉnh sửa hoặc xóa giao dịch phát sinh.
-8. Lợi ích sản phẩm:
-• Minh bạch hóa tài chính trong tập thể / tổ chức, giúp các thành viên chia sẻ trách nhiệm chi tiêu.
-• Kiểm soát chặt chẽ các khoản chi tiêu phát sinh, hạn chế tình trạng vượt hạn mức hoặc lãng phí.
-• Cung cấp dữ liệu thống kê trực quan, hỗ trợ lập kế hoạch tài chính dài hạn hiệu quả.
-• Thay thế hoàn toàn phương pháp ghi chép sổ sách thủ công truyền thống, nhanh chóng, chính xác và tiện lợi.
-9. Hạn chế:
-• Chưa hỗ trợ kết nối tự động với tài khoản ngân hàng hoặc ví điện tử.
-• Giao diện hiện tại tập trung vào phiên bản web cục bộ cơ bản, chưa có ứng dụng di động độc lập.
-• Chưa tích hợp tính năng đa tiền tệ.
-10. Phát triển:
-• Tích hợp công nghệ nhận diện hóa đơn/biên lai tự động qua camera thiết bị.
-• Phát triển ứng dụng di động để thuận tiện sử dụng mọi lúc mọi nơi.
-• Kết nối API ngân hàng để tự động ghi nhận biến động số dư và giao dịch chi tiêu.
-• Bổ sung tính năng lập quỹ tiết kiệm chung cho các mục tiêu lớn của tập thể / tổ chức (mua sắm, sự kiện, hoạt động, du lịch...).
+﻿1. TÊN DỰ ÁN
+Hệ thống quản lí chi tiêu cho tập thể / tổ chức
 
-11. Phạm vi của phiên bản hiện tại:
-• Có đăng nhập, phân quyền admin/user, quản lý tài khoản và danh mục, CRUD giao dịch, hạn mức tuần/tháng/quý, dashboard, báo cáo và xuất Excel/CSV.
-• Nguồn tiền gồm `personal`, `common` và `unit`; chưa hỗ trợ nhiều tổ chức hoặc nhiều đơn vị độc lập trong cùng hệ thống.
-• Có import `.xlsx` theo mẫu sau bước xem trước, cảnh báo giao dịch trùng, phân trang danh sách và audit log các thay đổi tài chính/quản trị.
-• Sao lưu SQLite có thể tạo từ giao diện quản trị; khôi phục qua giao diện chưa được hỗ trợ.
-• Bootstrap, Bootstrap Icons và Chart.js được đóng gói cục bộ để giao diện chạy không cần CDN.
-• Database mặc định là SQLite. Trên Linux, launcher Admin giữ nguyên dữ liệu đã có; launcher demo chỉ reset sau khi người dùng xác nhận.
+2. MỤC TIÊU VÀ BÀI TOÁN
+Dự án xây dựng ứng dụng web để tập thể hoặc tổ chức ghi nhận các khoản thu, chi; theo dõi hạn mức; và xem báo cáo tài chính. Ứng dụng hướng đến việc giảm ghi chép thủ công, giúp thành viên tra cứu giao dịch và giúp người quản trị theo dõi hoạt động tài chính minh bạch hơn.
+
+Thành viên đăng nhập bằng tài khoản được cấp, ghi nhận giao dịch và theo dõi dữ liệu trong phạm vi được phép. Hệ thống phân biệt tiền cá nhân, quỹ chung và ngân sách đơn vị. Quản trị viên quản lí tài khoản, danh mục, hạn mức và dữ liệu tổng quan.
+
+3. PHẠM VI VÀ CHỨC NĂNG HIỆN CÓ
+
+3.1. Đăng nhập và phân quyền
+- Người dùng đăng nhập bằng tài khoản do quản trị viên cấp.
+- Hệ thống có hai vai trò: quản trị viên (admin) và thành viên (user).
+- Mật khẩu được lưu dưới dạng băm.
+- Thành viên xem giao dịch cá nhân do mình tạo và các giao dịch thuộc nguồn dùng chung. Thành viên chỉ được sửa hoặc xóa giao dịch do mình tạo; quản trị viên có quyền quản lí toàn bộ giao dịch.
+- Các biểu mẫu gửi dữ liệu được bảo vệ bằng CSRF.
+
+3.2. Quản lí tài khoản thành viên
+Quản trị viên có thể tạo tài khoản, cập nhật tên hiển thị, đổi mật khẩu, thay đổi vai trò và khóa hoặc mở khóa tài khoản. Hệ thống không lưu mật khẩu dạng văn bản gốc.
+
+3.3. Quản lí danh mục thu và chi
+Quản trị viên có thể tạo, sửa, ẩn hoặc xóa danh mục chưa được giao dịch sử dụng. Danh mục đã liên kết với giao dịch được giữ lại để bảo toàn lịch sử. Mỗi danh mục có tên, loại thu nhập hoặc chi tiêu và trạng thái hoạt động.
+
+3.4. Quản lí giao dịch
+Thành viên có thể thêm, xem, sửa và xóa giao dịch của mình. Thông tin giao dịch gồm ngày, số tiền, danh mục, nguồn tiền và ghi chú. Loại thu hay chi được xác định theo loại của danh mục.
+
+Nguồn tiền hiện hỗ trợ:
+- `personal`: giao dịch cá nhân.
+- `common`: quỹ chung.
+- `unit`: ngân sách đơn vị.
+
+Hệ thống kiểm tra ngày, số tiền, danh mục, nguồn tiền và độ dài ghi chú ở phía máy chủ. Số tiền phải lớn hơn 0 và nằm trong giới hạn dữ liệu. Khi phát hiện giao dịch có cùng ngày, số tiền, danh mục và nguồn tiền, hệ thống cảnh báo để người dùng kiểm tra; người dùng có thể xác nhận nếu giao dịch trùng đó là có chủ đích.
+
+Danh sách giao dịch hỗ trợ lọc theo khoảng ngày, loại thu/chi, nguồn tiền, danh mục và thành viên (quản trị viên), đồng thời phân trang.
+
+3.5. Nhập dữ liệu Excel
+Quản trị viên có thể nhập tệp `.xlsx` theo mẫu. Hệ thống kiểm tra và hiển thị dữ liệu xem trước trước khi áp dụng; tệp và số dòng bị giới hạn. Dòng không hợp lệ hoặc trùng được bỏ qua và có thống kê kết quả nhập. Dữ liệu xem trước có thời hạn.
+
+3.6. Hạn mức và cảnh báo
+Hạn mức áp dụng theo tuần ISO, tháng hoặc quý. Hạn mức có thể gắn với một thành viên hoặc nguồn dùng chung (`common` / `unit`). Hệ thống cộng các giao dịch có danh mục loại chi tiêu, tính mức sử dụng trong kỳ và cảnh báo khi đạt từ 80% hoặc vượt hạn mức. Thu nhập không được cộng vào tổng chi.
+
+3.7. Bảng điều khiển và báo cáo
+Bảng điều khiển hiển thị tổng thu, tổng chi, chênh lệch thu - chi trong tháng, biểu đồ chi tiêu theo ngày, hạn mức đang hiệu lực và giao dịch gần đây. Báo cáo hỗ trợ khoảng ngày, tuần, tháng, năm hoặc khoảng tùy chọn; có thể lọc theo nguồn tiền và thành viên đối với quản trị viên. Báo cáo hiển thị tổng hợp theo loại, theo danh mục, biểu đồ và danh sách giao dịch.
+
+Báo cáo có thể xuất thành Excel (`.xlsx`) hoặc CSV UTF-8. Tệp Excel gồm trang tổng quan và danh sách giao dịch. Khi xuất, dữ liệu tổng hợp được tính trên toàn bộ tập kết quả lọc, không chỉ các dòng đang hiển thị ở trang hiện tại.
+
+3.8. Nhật kí hoạt động và sao lưu
+Nhật kí ghi nhận các thay đổi quản trị và tài chính như tài khoản, danh mục, hạn mức, giao dịch, nhập Excel và sao lưu; không ghi giá trị mật khẩu. Nội dung nhật kí được trình bày bằng câu dễ hiểu cho người dùng.
+
+Quản trị viên có thể tạo và tải bản sao lưu SQLite đã kiểm tra toàn vẹn. Bản sao lưu cũng được lưu trên máy chủ. Khôi phục từ giao diện chưa được hỗ trợ; hiện cần dừng ứng dụng và khôi phục thủ công.
+
+3.9. Chạy ứng dụng
+Ứng dụng dùng Python 3.11, Flask, Flask-SQLAlchemy, SQLite, Flask-Login, Flask-WTF, Waitress và Bootstrap. Kiến trúc là Application Factory kết hợp Blueprint. Bootstrap, Bootstrap Icons và Chart.js được lưu cục bộ nên giao diện không phụ thuộc CDN sau khi cài đặt các gói Python. Ứng dụng có launcher cho Windows và Linux / Raspberry Pi; host và port được cấu hình qua biến môi trường.
+
+4. CẤU TRÚC CƠ SỞ DỮ LIỆU
+
+CSDL hiện có các bảng `Role`, `User`, `Category`, `Expense`, `Budget` và `AuditLog`. Bảng dưới mô tả cấu trúc nghiệp vụ để giải thích quan hệ; đây là tài liệu tham khảo, không phải bảng bổ sung trong CSDL.
+
+4.1. Các bảng và trường chính
+
+Bảng Role — vai trò người dùng
+- `idRole`: khóa chính.
+- `roleName`: tên vai trò, ví dụ `admin` hoặc `user`; duy nhất.
+- `description`: mô tả vai trò.
+
+Bảng User — tài khoản thành viên
+- `idUser`: khóa chính.
+- `username`: tên đăng nhập; duy nhất.
+- `password`: chuỗi mật khẩu đã băm.
+- `hoten`: tên hiển thị.
+- `idRole`: khóa ngoại đến `Role.idRole`.
+- `is_active_account`: trạng thái khóa / hoạt động.
+- `created_at`: thời điểm tạo tài khoản.
+
+Bảng Category — danh mục thu, chi
+- `idCategory`: khóa chính.
+- `nameCategory`: tên danh mục.
+- `type`: loại `income` hoặc `expense`.
+- `is_active`: danh mục đang hoạt động hay đã ẩn.
+- Cặp `nameCategory` và `type` phải duy nhất.
+
+Bảng Expense — giao dịch thu, chi
+- `idExpense`: khóa chính.
+- `idUser`: khóa ngoại đến `User.idUser`, là người ghi nhận giao dịch.
+- `idCategory`: khóa ngoại đến `Category.idCategory`.
+- `date`: ngày giao dịch.
+- `amount`: số tiền, lưu với độ chính xác hai chữ số thập phân.
+- `purpose`: mục đích hoặc ghi chú.
+- `source`: nguồn tiền `personal`, `common` hoặc `unit`.
+- `created_at`, `updated_at`: thời điểm tạo và cập nhật.
+
+Bảng Budget — hạn mức
+- `idBudget`: khóa chính.
+- `idUser`: khóa ngoại tùy chọn đến `User.idUser`; có giá trị với hạn mức cá nhân, để trống với hạn mức dùng chung.
+- `amountLimit`: số tiền hạn mức.
+- `month`, `year`: thông tin kỳ áp dụng; `month` có thể để trống cho hạn mức tuần.
+- `source`: nguồn áp dụng (`personal`, `common` hoặc `unit`).
+- `period_type`, `period_number`: loại kỳ và số thứ tự tuần / tháng / quý.
+- `created_at`: thời điểm tạo.
+
+Bảng AuditLog — nhật kí hoạt động
+- `idAuditLog`: khóa chính.
+- `actor_id`: khóa ngoại tùy chọn đến `User.idUser`; để trống nếu tài khoản thực hiện bị xóa.
+- `actor_name`: tên người thực hiện được lưu tại thời điểm thao tác.
+- `action`: hành động, ví dụ tạo, cập nhật, xóa, nhập hoặc sao lưu.
+- `entity_type`, `entity_id`: loại và mã đối tượng bị tác động; `entity_id` là mã tham chiếu trong nội dung nhật kí, không phải khóa ngoại tổng quát.
+- `details`: nội dung chi tiết dạng JSON; không chứa mật khẩu.
+- `created_at`: thời điểm ghi nhật kí.
+
+4.2. Bảng quan hệ giữa các bảng
+Bảng này chỉ diễn giải khóa ngoại và lực lượng quan hệ, không tạo thêm bảng trong CSDL.
+
+| Bảng cha | Khóa được tham chiếu | Bảng con | Khóa ngoại | Quan hệ | Diễn giải |
+| --- | --- | --- | --- | --- | --- |
+| Role | `idRole` | User | `idRole` | 1 - nhiều | Một vai trò có thể gán cho nhiều tài khoản; mỗi tài khoản có một vai trò. |
+| User | `idUser` | Expense | `idUser` | 1 - nhiều | Một thành viên có thể ghi nhận nhiều giao dịch; mỗi giao dịch có một người ghi nhận. |
+| Category | `idCategory` | Expense | `idCategory` | 1 - nhiều | Một danh mục có thể được dùng cho nhiều giao dịch; mỗi giao dịch thuộc một danh mục. |
+| User | `idUser` | Budget | `idUser` (có thể NULL) | 1 - 0..n | Một thành viên có thể có nhiều hạn mức cá nhân; hạn mức nguồn chung không gắn với một thành viên cụ thể. |
+| User | `idUser` | AuditLog | `actor_id` (có thể NULL) | 1 - 0..n | Một người dùng có thể tạo nhiều nhật kí; nhật kí vẫn giữ tên người thực hiện nếu tài khoản bị xóa. |
+
+Có thể hình dung các quan hệ chính như sau:
+
+`Role (1) ─── (n) User (1) ─── (n) Expense (n) ─── (1) Category`
+
+`User (1) ─── (n) Budget`
+
+`User (1) ─── (n) AuditLog`
+
+5. MÔ TẢ LUỒNG SỬ DỤNG
+1. Quản trị viên đăng nhập và tạo tài khoản cho thành viên.
+2. Quản trị viên tạo các danh mục thu, chi phù hợp với tập thể.
+3. Quản trị viên thiết lập hạn mức tuần, tháng hoặc quý cho thành viên hay nguồn dùng chung.
+4. Thành viên ghi nhận giao dịch, chọn danh mục và nguồn tiền; kiểm tra cảnh báo trùng nếu có.
+5. Thành viên theo dõi giao dịch và hạn mức; quản trị viên xem báo cáo tổng thể và nhật kí.
+6. Người có quyền xuất báo cáo; quản trị viên có thể tạo bản sao lưu định kì.
+
+6. GỢI Ý HÌNH MINH HỌA
+Không chèn hình vào tài liệu ở phiên bản này. Các hình dưới đây chỉ là gợi ý để người viết bổ sung sau:
+- Sơ đồ use case: vai trò admin và user cùng các chức năng được phép sử dụng.
+- Sơ đồ quan hệ dữ liệu (ERD): sáu bảng và các khóa ngoại tại mục 4.2.
+- Ảnh màn hình dashboard: thẻ tổng thu/chi, biểu đồ ngày và tiến độ hạn mức; dùng dữ liệu demo, che thông tin tài khoản.
+- Ảnh màn hình nhập giao dịch: biểu mẫu ngày, danh mục, nguồn tiền, số tiền và ghi chú.
+- Ảnh màn hình cảnh báo hạn mức hoặc giao dịch trùng: thể hiện rõ điều kiện và hành động người dùng có thể chọn.
+- Ảnh màn hình báo cáo và xuất dữ liệu: bộ lọc thời gian, tổng hợp và nút xuất Excel/CSV.
+- Ảnh màn hình nhập Excel có xem trước: minh họa dòng hợp lệ, dòng lỗi và dòng trùng.
+- Ảnh màn hình sao lưu và nhật kí hoạt động: minh họa trạng thái sao lưu và mô tả thao tác bằng ngôn ngữ dễ hiểu.
+
+7. HẠN CHẾ HIỆN TẠI
+- Chưa kết nối ngân hàng hoặc ví điện tử; giao dịch được nhập thủ công hoặc nhập từ tệp Excel theo mẫu.
+- Chưa có ứng dụng di động độc lập và chưa hỗ trợ nhiều loại tiền tệ.
+- Nguồn `unit` hiện là phạm vi dùng chung trong một CSDL; chưa hỗ trợ nhiều tổ chức / đơn vị độc lập với phân vùng dữ liệu riêng.
+- Khôi phục bản sao lưu chưa có giao diện.
+- Chưa tích hợp AI. Tài liệu yêu cầu tích hợp AI là định hướng mới cần được xác định thành phạm vi chức năng, cách triển khai và tiêu chí đánh giá riêng.
+- Các tài liệu hướng dẫn cũ có thể chứa tên database hoặc branch trước đây; khi triển khai cần kiểm tra mã nguồn và cấu hình đang dùng. Database mặc định hiện tại là `instance/expense.db`; branch làm việc hiện tại là `codex`.
+
+8. ĐỀ XUẤT CẢI TIẾN THEO THỨ TỰ ƯU TIÊN
+
+Giai đoạn 1 — củng cố độ tin cậy
+1. Bổ sung và duy trì kiểm thử tự động cho đăng nhập, phân quyền, giao dịch, hạn mức, nhập Excel, báo cáo, xuất tệp và sao lưu.
+2. Thêm migration cơ sở dữ liệu để cập nhật schema an toàn khi thay đổi model; `create_all()` không thay thế migration.
+3. Rà soát phân quyền và các trường hợp biên; kiểm tra phục hồi giao dịch sau lỗi, dữ liệu nhập sai và thao tác đồng thời.
+4. Hoàn thiện quy trình sao lưu: hướng dẫn lưu bản sao ở thiết bị khác, kiểm tra khả năng khôi phục và cảnh báo khi bản sao lỗi.
+
+Giai đoạn 2 — tích hợp AI có kiểm soát
+1. Ưu tiên thử nghiệm đọc hóa đơn / biên lai: người dùng tải ảnh, hệ thống trích ngày, số tiền và nội dung, sau đó điền vào biểu mẫu giao dịch.
+2. Chỉ lưu giao dịch sau khi người dùng xem lại và xác nhận; AI không được tự quyết định số tiền, danh mục hay nguồn tiền.
+3. Đo độ chính xác trên bộ ảnh mẫu có nhãn; cho phép sửa kết quả và xử lí khi không đọc được.
+4. Chọn cách chạy phù hợp. API trực tuyến cần Internet, khóa API và đánh giá dữ liệu nào được gửi đi. Mô hình cục bộ hỗ trợ riêng tư / offline hơn nhưng cần kiểm tra tài nguyên, nhất là trên Raspberry Pi Zero 2 W.
+5. Sau khi có dữ liệu tổng hợp đáng tin cậy, cân nhắc bổ sung phần giải thích báo cáo bằng AI. Chỉ gửi dữ liệu tối thiểu cần thiết, không gửi ghi chú cá nhân hoặc thông tin nhận dạng nếu không cần.
+
+Giai đoạn 3 — mở rộng vận hành và trải nghiệm
+1. Thêm khôi phục bản sao lưu qua giao diện với xác nhận rõ ràng, kiểm tra tệp, tạo bản sao an toàn trước khi thay dữ liệu và ghi nhật kí thao tác.
+2. Cải thiện giao diện cho màn hình nhỏ và khả năng tiếp cận.
+3. Hỗ trợ xuất / nhập theo cấu hình cột rõ ràng, có báo cáo lỗi để người dùng sửa dữ liệu.
+4. Nếu thực sự cần nhiều đơn vị độc lập, thiết kế mô hình tổ chức và phân vùng dữ liệu trước khi bổ sung; không chỉ đổi nhãn `unit`.
+5. Chỉ xem xét kết nối ngân hàng, đa tiền tệ hoặc ứng dụng di động khi có yêu cầu sử dụng và điều kiện bảo mật, pháp lí, vận hành phù hợp.
+
+9. TIÊU CHÍ ĐÁNH GIÁ ĐỀ XUẤT AI
+- Kết quả AI là gợi ý có thể kiểm tra; người dùng quyết định trước khi lưu dữ liệu.
+- Có thể đo độ chính xác trên tập dữ liệu kiểm thử và ghi nhận trường hợp cần sửa.
+- Không làm suy yếu phân quyền hiện có; người dùng chỉ xử lí dữ liệu họ vốn được phép xem.
+- Có phương án khi mất mạng, dịch vụ AI lỗi, hết hạn mức API hoặc mô hình trả kết quả sai.
+- Không gửi dữ liệu tài chính ra dịch vụ ngoài nếu chưa nêu rõ dữ liệu, mục đích và cách bảo vệ.
+
+10. KẾT LUẬN
+Phiên bản hiện tại đã bao phủ luồng cốt lõi: quản lí tài khoản và danh mục, ghi nhận thu chi, hạn mức, báo cáo, nhập Excel, nhật kí và sao lưu. Bước tiếp theo nên củng cố kiểm thử và quy trình dữ liệu, sau đó xây dựng một chức năng AI nhỏ, có thể đo lường và luôn yêu cầu người dùng xác nhận trước khi ghi nhận giao dịch.
